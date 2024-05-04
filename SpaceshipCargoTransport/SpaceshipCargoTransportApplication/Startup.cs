@@ -6,15 +6,6 @@ namespace SpaceshipCargoTransport.Application
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; private set; }
-
-        public ILifetimeScope AutofacContainer { get; private set; }
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEndpointsApiExplorer();
@@ -34,7 +25,7 @@ namespace SpaceshipCargoTransport.Application
         }
 
         public void Configure(
-          IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+          IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -42,7 +33,12 @@ namespace SpaceshipCargoTransport.Application
                 app.UseSwaggerUI();
             }
 
+            app.UseCors(builder =>
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+
             app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>  endpoints.MapControllers());
         }
     }
 }
