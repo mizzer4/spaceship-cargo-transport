@@ -1,4 +1,5 @@
-﻿using SpaceshipCargoTransport.Domain.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Repositories;
 using SpaceshipCargoTransport.Persistence.Db;
 
@@ -13,38 +14,39 @@ namespace SpaceshipCargoTransport.Persistence.Repositories
             _context = context;
         }
 
-        public bool Create(Spaceship ship)
+        public async Task<bool> CreateAsync(Spaceship ship)
         {
-            _context.Spaceships.Add(ship);
-            return SaveChanges();
+            await _context.Spaceships.AddAsync(ship);
+            return await SaveChangesAsync();
         }
 
-        public bool Delete(Spaceship ship)
+        public async Task<bool> DeleteAsync(Spaceship ship)
         {
             _context.Spaceships.Remove(ship);
-            return SaveChanges();
+            return await SaveChangesAsync();
         }
 
-        public Spaceship? Get(Guid id)
+        public async Task<Spaceship?> GetAsync(Guid id)
         {
-            return _context.Spaceships
-                .Where(c => c.Id == id).FirstOrDefault();
+            return await _context.Spaceships
+                .Where(c => c.Id == id).FirstOrDefaultAsync();
         }
 
-        public IEnumerable<Spaceship> GetAll()
+        public async Task<IEnumerable<Spaceship>> GetAllAsync()
         {
-            return _context.Spaceships.ToList();
+            return await _context.Spaceships.ToListAsync();
         }
 
-        public bool Update(Spaceship ship)
+        public async Task<bool> UpdateAsync(Spaceship ship)
         {
             _context.Spaceships.Update(ship);
-            return SaveChanges();
+            return await SaveChangesAsync();
         }
 
-        private bool SaveChanges()
+        private async Task<bool> SaveChangesAsync()
         {
-            return _context.SaveChanges() > 0;
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

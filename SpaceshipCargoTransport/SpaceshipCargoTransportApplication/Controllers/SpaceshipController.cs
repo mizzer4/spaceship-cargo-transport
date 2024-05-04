@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using SpaceshipCargoTransport.Application.DTOs;
+using SpaceshipCargoTransport.Application.DTOs.Spaceship;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Services;
 
@@ -20,23 +20,23 @@ namespace SpaceshipCargoTransport.Application.Controllers
         }
 
         /// <summary>
-        /// This endpoint returns all spaceships.
+        /// Returns all spaceships.
         /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SpaceshipReadDTO>>> GetAll()
         {
-            var spaceships = _spaceshipService.GetAll();
+            var spaceships = await _spaceshipService.GetAllAsync();
 
-            return Ok(_mapper.Map<SpaceshipReadDTO>(spaceships));
+            return Ok(_mapper.Map<IEnumerable<SpaceshipReadDTO>>(spaceships));
         }
 
         /// <summary>
-        /// This endpoint returns single spaceship with provided id.
+        /// Returns single spaceship with provided id.
         /// </summary>
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetSpaceship")]
         public async Task<ActionResult<SpaceshipReadDTO>> Get(Guid id)
         {
-            var spaceship = _spaceshipService.Get(id);
+            var spaceship = await _spaceshipService.GetAsync(id);
 
             if (spaceship == null)
             {
@@ -47,38 +47,38 @@ namespace SpaceshipCargoTransport.Application.Controllers
         }
 
         /// <summary>
-        /// This endpoint creates a spaceship with provided values.
+        /// Creates a spaceship with provided values.
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult<SpaceshipReadDTO>> Create([FromBody] SpaceshipCreateDTO newSpaceship)
+        public async Task<ActionResult<SpaceshipReadDTO>> Create([FromBody] SpaceshipCreateDTO spaceshipDTO)
         {
-            var spaceship = _mapper.Map<Spaceship>(newSpaceship);
+            var spaceship = _mapper.Map<Spaceship>(spaceshipDTO);
 
-            if (_spaceshipService.Create(spaceship))
+            if (await _spaceshipService.CreateAsync(spaceship))
                 return CreatedAtRoute(nameof(Get), new { spaceship.Id }, spaceship);
 
             return BadRequest();
         }
 
         /// <summary>
-        /// This endpoint updates a spaceship with given values.
+        /// Updates a spaceship with given values.
         /// </summary>
-        [HttpPut("{id}", Name = "Update")]
+        [HttpPut("{id}", Name = "UpdateSpaceship")]
         public async Task<ActionResult<Spaceship>> Update([FromBody] SpaceshipUpdateDTO spaceship)
         {
-            if (_spaceshipService.Update(_mapper.Map<Spaceship>(spaceship)))
+            if (await _spaceshipService.UpdateAsync(_mapper.Map<Spaceship>(spaceship)))
                 return Ok();
 
             return BadRequest();
         }
 
         /// <summary>
-        /// This endpoint deletes a spaceship.
+        /// Deletes a spaceship.
         /// </summary>
-        [HttpDelete("{id}", Name = "Delete")]
+        [HttpDelete("{id}", Name = "DeleteSpaceship")]
         public async Task<ActionResult<Spaceship>> Delete([FromBody] SpaceshipDeleteDTO spaceship)
         {
-            if (_spaceshipService.Delete(_mapper.Map<Spaceship>(spaceship)))
+            if (await _spaceshipService.DeleteAsync(_mapper.Map<Spaceship>(spaceship)))
                 return Ok();
 
             return BadRequest();
