@@ -12,29 +12,29 @@ namespace SpaceshipCargoTransport.Domain.Services
             _planetRepository = planetRepository;
         }
 
-        public bool Create(Planet planet)
+        public Task<bool> CreateAsync(Planet planet)
         {
-            return _planetRepository.Create(planet);
+            return _planetRepository.CreateAsync(planet);
         }
 
-        public bool Delete(int id)
+        public Task<bool> DeleteAsync(Planet planet)
         {
-            return _planetRepository.Delete(id);
+            return _planetRepository.DeleteAsync(planet);
         }
 
-        public Planet Get(int id)
+        public Task<Planet> GetAsync(Guid id)
         {
-            return _planetRepository.Get(id);
+            return _planetRepository.GetAsync(id);
         }
 
-        public IEnumerable<Planet> GetAll()
+        public Task<IEnumerable<Planet>> GetAllAsync()
         {
-            return _planetRepository.GetAll();
+            return _planetRepository.GetAllAsync();
         }
 
-        public bool Update(Planet planet)
+        public Task<bool> UpdateAsync(Planet planet)
         {
-            return _planetRepository.Update(planet);
+            return _planetRepository.UpdateAsync(planet);
         }
     }
 }

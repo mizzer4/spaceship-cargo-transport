@@ -4,10 +4,10 @@ namespace SpaceshipCargoTransport.Domain.Repositories
 {
     public interface ISpaceshipRepository
     {
-        Spaceship? Get(Guid id);
-        IEnumerable<Spaceship> GetAll();
-        bool Create(Spaceship ship);
-        bool Update(Spaceship ship);
-        bool Delete(Spaceship ship);
+        Task<Spaceship?> GetAsync(Guid id);
+        Task<IEnumerable<Spaceship>> GetAllAsync();
+        Task<bool> CreateAsync(Spaceship ship);
+        Task<bool> UpdateAsync(Spaceship ship);
+        Task<bool> DeleteAsync(Spaceship ship);
     }
 }

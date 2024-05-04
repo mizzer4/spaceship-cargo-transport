@@ -4,10 +4,10 @@ namespace SpaceshipCargoTransport.Domain.Services
 {
     public interface IPlanetService
     {
-        Planet Get(int id);
-        IEnumerable<Planet> GetAll();
-        bool Create(Planet planet);
-        bool Update(Planet planet);
-        bool Delete(int id);
+        Task<Planet?> GetAsync(Guid id);
+        Task<IEnumerable<Planet>> GetAllAsync();
+        Task<bool> CreateAsync(Planet planet);
+        Task<bool> UpdateAsync(Planet planet);
+        Task<bool> DeleteAsync(Planet planet);
     }
 }

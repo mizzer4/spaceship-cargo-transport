@@ -11,12 +11,16 @@ namespace SpaceshipCargoTransport.Persistence.DependencyInjection
             builder.Register(ctx => new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new SpaceshipProfile());
+                cfg.AddProfile(new PlanetProfile());
             }
             )).AsSelf().SingleInstance();
 
-            builder.Register(ctx => ctx.Resolve<MapperConfiguration>().CreateMapper())
-            .As<IMapper>()
-            .InstancePerLifetimeScope();
+            builder.Register(c =>
+            {
+                var context = c.Resolve<IComponentContext>();
+                var config = context.Resolve<MapperConfiguration>();
+                return config.CreateMapper(context.Resolve);
+            }).As<IMapper>().InstancePerLifetimeScope();
         }
     }
 }
