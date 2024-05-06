@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpaceshipCargoTransportDomain\SpaceshipCargoTransport.Domain.csproj" />
+    <ProjectReference Include="..\SpaceshipCargoTransport.Domain\SpaceshipCargoTransport.Domain.csproj" />
   </ItemGroup>
 
 </Project>
