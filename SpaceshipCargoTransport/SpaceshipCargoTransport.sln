@@ -3,11 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceshipCargoTransport.Domain", "SpaceshipCargoTransportDomain\SpaceshipCargoTransport.Domain.csproj", "{A865B00C-B227-4269-B076-39C148559226}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceshipCargoTransport.Domain", "SpaceshipCargoTransport.Domain\SpaceshipCargoTransport.Domain.csproj", "{A865B00C-B227-4269-B076-39C148559226}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceshipCargoTransport.Application", "SpaceshipCargoTransportApplication\SpaceshipCargoTransport.Application.csproj", "{16577BEC-3481-4FF1-B2FA-AEB6240D9A03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceshipCargoTransport.Application", "SpaceshipCargoTransport.Application\SpaceshipCargoTransport.Application.csproj", "{16577BEC-3481-4FF1-B2FA-AEB6240D9A03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceshipCargoTransport.Persistence", "SpaceshipCargoTransport.Persistence\SpaceshipCargoTransport.Persistence.csproj", "{0D114194-E81F-489C-AA00-C3D6AD09B738}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceshipCargoTransport.Persistence", "SpaceshipCargoTransport.Persistence\SpaceshipCargoTransport.Persistence.csproj", "{0D114194-E81F-489C-AA00-C3D6AD09B738}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceshipCargoTransport.Domain.UnitTests", "SpaceshipCargoTransport.Domain.UnitTests\SpaceshipCargoTransport.Domain.UnitTests.csproj", "{8601D312-BBA5-4A3F-9750-7CABC8EAE99C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceshipCargoTransport.Notifications", "SpaceshipCargoTransport.Notifications\SpaceshipCargoTransport.Notifications.csproj", "{CEAFDBEA-0DB0-4889-9630-80CB73A16CDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D83392CB-39A3-4FC3-A078-1AAC8C28E754}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +36,14 @@ Global
 		{0D114194-E81F-489C-AA00-C3D6AD09B738}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D114194-E81F-489C-AA00-C3D6AD09B738}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D114194-E81F-489C-AA00-C3D6AD09B738}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8601D312-BBA5-4A3F-9750-7CABC8EAE99C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8601D312-BBA5-4A3F-9750-7CABC8EAE99C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8601D312-BBA5-4A3F-9750-7CABC8EAE99C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8601D312-BBA5-4A3F-9750-7CABC8EAE99C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEAFDBEA-0DB0-4889-9630-80CB73A16CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEAFDBEA-0DB0-4889-9630-80CB73A16CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEAFDBEA-0DB0-4889-9630-80CB73A16CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEAFDBEA-0DB0-4889-9630-80CB73A16CDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
