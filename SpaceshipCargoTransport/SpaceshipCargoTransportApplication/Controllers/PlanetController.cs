@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using SpaceshipCargoTransport.Application.DTOs.Planet;
+using SpaceshipCargoTransport.Application.DTOs.PlanetDTOs;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Services;
 
@@ -25,9 +25,9 @@ namespace PlanetCargoTransport.Application.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PlanetReadDTO>>> GetAll()
         {
-            var Planets = await _planetService.GetAllAsync();
+            var planets = await _planetService.GetAllAsync();
 
-            return Ok(_mapper.Map<IEnumerable<PlanetReadDTO>>(Planets));
+            return Ok(_mapper.Map<IEnumerable<PlanetReadDTO>>(planets));
         }
 
         /// <summary>
@@ -55,7 +55,11 @@ namespace PlanetCargoTransport.Application.Controllers
             var planet = _mapper.Map<Planet>(PlanetDTO);
 
             if (await _planetService.CreateAsync(planet))
-                return CreatedAtRoute(nameof(Get), new { planet.Id }, planet);
+            {
+                var planetReadDTO = _mapper.Map<PlanetReadDTO>(planet);
+                return CreatedAtRoute(nameof(Get), new { planet.Id }, planetReadDTO);
+            }
+                
 
             return BadRequest();
         }
@@ -76,7 +80,7 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Deletes a planet.
         /// </summary>
         [HttpDelete("{id}", Name = "DeletePlanet")]
-        public async Task<ActionResult<Planet>> Delete([FromBody] PlanetDeleteDTO planet)
+        public async Task<ActionResult> Delete([FromBody] PlanetDeleteDTO planet)
         {
             if (await _planetService.DeleteAsync(_mapper.Map<Planet>(planet)))
                 return Ok();

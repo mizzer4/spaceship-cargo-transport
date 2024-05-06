@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SpaceshipCargoTransport.Application.DTOs.Planet;
+using SpaceshipCargoTransport.Application.DTOs.PlanetDTOs;
 using SpaceshipCargoTransport.Domain.Models;
 
 namespace SpaceshipCargoTransport.Application.Profiles
