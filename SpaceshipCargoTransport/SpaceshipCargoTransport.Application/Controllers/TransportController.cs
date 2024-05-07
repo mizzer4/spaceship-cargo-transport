@@ -27,7 +27,7 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Returns single transport with provided id.
         /// </summary>
         [HttpGet("{id}", Name = "GetTransport")]
-        public async Task<ActionResult<TransportReadDTO>> Get(Guid id)
+        public async Task<ActionResult<TransportReadDTO>> GetTransport(Guid id)
         {
             var transport = await _transportService.GetDetailsAsync(id);
 
@@ -58,7 +58,7 @@ namespace SpaceshipCargoTransport.Application.Controllers
             if (await _transportService.RegisterNewAsync(transport))
             {
                 var transportReadDTO = _mapper.Map<TransportReadDTO>(transport);
-                return CreatedAtRoute(nameof(Get), new { transportReadDTO.Id }, transportReadDTO);
+                return CreatedAtRoute(nameof(GetTransport), new { id = transportReadDTO.Id }, transportReadDTO);
             }
 
             return BadRequest();

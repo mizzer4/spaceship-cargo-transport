@@ -23,7 +23,7 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Returns all planets.
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlanetReadDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<PlanetReadDTO>>> GetAllPlanets()
         {
             var planets = await _planetService.GetAllAsync();
 
@@ -34,7 +34,7 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Returns single planet with provided id.
         /// </summary>
         [HttpGet("{id}", Name = "GetPlanet")]
-        public async Task<ActionResult<PlanetReadDTO>> Get(Guid id)
+        public async Task<ActionResult<PlanetReadDTO>> GetPlanet(Guid id)
         {
             var planet = await _planetService.GetAsync(id);
 
@@ -57,7 +57,7 @@ namespace PlanetCargoTransport.Application.Controllers
             if (await _planetService.CreateAsync(planet))
             {
                 var planetReadDTO = _mapper.Map<PlanetReadDTO>(planet);
-                return CreatedAtRoute(nameof(Get), new { planet.Id }, planetReadDTO);
+                return CreatedAtRoute(nameof(GetPlanet), new { id = planet.Id }, planetReadDTO);
             }
                 
 
@@ -68,7 +68,7 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Updates a planet with given values.
         /// </summary>
         [HttpPut("{id}", Name = "UpdatePlanet")]
-        public async Task<ActionResult<Planet>> Update([FromBody] PlanetUpdateDTO planet)
+        public async Task<ActionResult<Planet>> UpdatePlanet([FromBody] PlanetUpdateDTO planet)
         {
             if (await _planetService.UpdateAsync(_mapper.Map<Planet>(planet)))
                 return Ok();
@@ -80,7 +80,7 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Deletes a planet.
         /// </summary>
         [HttpDelete("{id}", Name = "DeletePlanet")]
-        public async Task<ActionResult> Delete([FromRoute] PlanetDeleteDTO planet)
+        public async Task<ActionResult> DeletePlanet([FromRoute] PlanetDeleteDTO planet)
         {
             if (await _planetService.DeleteAsync(_mapper.Map<Planet>(planet)))
                 return Ok();
