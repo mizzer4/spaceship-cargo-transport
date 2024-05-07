@@ -32,16 +32,14 @@ namespace SpaceshipCargoTransport.Application
         }
 
         public void Configure(
-          IApplicationBuilder app, IWebHostEnvironment env)
+          IApplicationBuilder app)
         {
-
             app.UseSwagger();
             app.UseSwaggerUI();
 
             app.UseCors(builder =>
                 builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
-            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseEndpoints(endpoints =>  endpoints.MapControllers());
         }
