@@ -19,12 +19,22 @@ namespace SpaceshipCargoTransport.Persistence.DependencyInjection
 
         protected override void Load(ContainerBuilder builder)
         {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
             builder.RegisterType<SpaceshipRepository>().As<ISpaceshipRepository>();
 
             builder.Register(c =>
             {
                 var opt = new DbContextOptionsBuilder<AppDbContext>();
-                opt.UseSqlServer(Configuration.GetConnectionString("SpaceshipCargoDb"));
+
+                if (environment == "Development")
+                {
+                    opt.UseInMemoryDatabase("InMem");
+                }
+                else
+                {
+                    opt.UseSqlServer(Configuration.GetConnectionString("SpaceshipCargoDb"));
+                }
 
                 return new AppDbContext(opt.Options);
             }).AsSelf().InstancePerLifetimeScope();
