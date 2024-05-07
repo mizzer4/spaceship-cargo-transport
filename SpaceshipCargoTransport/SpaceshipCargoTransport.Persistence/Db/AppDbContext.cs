@@ -11,5 +11,6 @@ namespace SpaceshipCargoTransport.Persistence.Db
 
         public DbSet<Spaceship> Spaceships { get; set; }
         public DbSet<Planet> Planets { get; set; }
+        public DbSet<Transport> Transports { get; set; }
     }
 }
