@@ -2,7 +2,7 @@
 
 namespace SpaceshipCargoTransport.Domain.Validators
 {
-    internal class TransportValidator : ITransportValidator
+    public class TransportValidator : ITransportValidator
     {
         public bool IsValid(Transport transport)
         {
@@ -10,15 +10,15 @@ namespace SpaceshipCargoTransport.Domain.Validators
             var isValid = IsSpaceshipCargoSpaceEnough(transport) &&
                 IsDestinationDifferentPlanet(transport);
 
-            return true;
+            return isValid;
         }
 
-        private bool IsSpaceshipCargoSpaceEnough(Transport transport)
+        public bool IsSpaceshipCargoSpaceEnough(Transport transport)
         {
-            return transport.Spaceship.CargoStorageSize >= transport.CargoSize;
+            return transport.Spaceship.cargoStorageSpace >= transport.CargoSize;
         }
 
-        private bool IsDestinationDifferentPlanet(Transport transport)
+        public bool IsDestinationDifferentPlanet(Transport transport)
         {
             return transport.StartingLocation != transport.EndingLocation;
         }

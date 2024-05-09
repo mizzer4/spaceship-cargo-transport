@@ -2,7 +2,7 @@
 
 namespace SpaceshipCargoTransport.Domain.Validators
 {
-    internal interface ITransportValidator
+    public interface ITransportValidator
     {
         bool IsValid(Transport transport);
     }
