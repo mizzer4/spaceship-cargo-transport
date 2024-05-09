@@ -5,7 +5,7 @@ using SpaceshipCargoTransport.Domain.Validators;
 
 namespace SpaceshipCargoTransport.Domain.Services
 {
-    internal class TransportService : ITransportService
+    public class TransportService : ITransportService
     {
         private readonly ITransportRepository _transportRepository;
         private readonly ITransportValidator _transportValidator;

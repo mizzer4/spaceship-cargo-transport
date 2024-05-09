@@ -3,7 +3,7 @@ using SpaceshipCargoTransport.Domain.Repositories;
 
 namespace SpaceshipCargoTransport.Domain.Services
 {
-    internal class PlanetService : IPlanetService
+    public class PlanetService : IPlanetService
     {
         private readonly IPlanetRepository _planetRepository;
 
@@ -22,7 +22,7 @@ namespace SpaceshipCargoTransport.Domain.Services
             return _planetRepository.DeleteAsync(planet);
         }
 
-        public Task<Planet> GetAsync(Guid id)
+        public Task<Planet?> GetAsync(Guid id)
         {
             return _planetRepository.GetAsync(id);
         }

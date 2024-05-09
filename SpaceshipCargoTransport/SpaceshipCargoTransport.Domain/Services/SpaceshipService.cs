@@ -3,7 +3,7 @@ using SpaceshipCargoTransport.Domain.Repositories;
 
 namespace SpaceshipCargoTransport.Domain.Services
 {
-    internal class SpaceshipService : ISpaceshipService
+    public class SpaceshipService : ISpaceshipService
     {
         private readonly ISpaceshipRepository _spaceshipRepository;
 
