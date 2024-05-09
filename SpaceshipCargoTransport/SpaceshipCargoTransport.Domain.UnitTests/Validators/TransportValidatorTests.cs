@@ -16,7 +16,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Validators
             // given
             var fixture = new Fixture();
             var spaceship = fixture.Build<Spaceship>()
-                .With(x => x.cargoStorageSpace, cargoStorageSpace)
+                .With(x => x.CargoStorageSpace, cargoStorageSpace)
                 .Create();
             var transport = fixture.Build<Transport>()
                 .With(x => x.CargoSize, cargoSize)
@@ -41,7 +41,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Validators
             // given
             var fixture = new Fixture();
             var spaceship = fixture.Build<Spaceship>()
-                .With(x => x.cargoStorageSpace, cargoStorageSpace)
+                .With(x => x.CargoStorageSpace, cargoStorageSpace)
                 .Create();
             var transport = fixture.Build<Transport>()
                 .With(x => x.CargoSize, cargoSize)
