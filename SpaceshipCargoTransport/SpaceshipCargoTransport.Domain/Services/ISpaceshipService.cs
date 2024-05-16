@@ -8,6 +8,6 @@ namespace SpaceshipCargoTransport.Domain.Services
         Task<IEnumerable<Spaceship>> GetAllAsync();
         Task<bool> CreateAsync(Spaceship ship);
         Task<bool> UpdateAsync(Spaceship ship);
-        Task<bool> DeleteAsync(Spaceship ship);
+        Task<bool> DeleteAsync(Guid id);
     }                    
 }

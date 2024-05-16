@@ -15,7 +15,7 @@ namespace SpaceshipCargoTransport.Domain.Validators
 
         public bool IsSpaceshipCargoSpaceEnough(Transport transport)
         {
-            return transport.Spaceship.cargoStorageSpace >= transport.CargoSize;
+            return transport.Spaceship.CargoStorageSpace >= transport.CargoSize;
         }
 
         public bool IsDestinationDifferentPlanet(Transport transport)

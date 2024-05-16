@@ -45,15 +45,7 @@ namespace SpaceshipCargoTransport.Application.Controllers
         [HttpPost]
         public async Task<ActionResult<TransportReadDTO>> Create([FromBody] TransportCreateDTO transportDTO)
         {
-            var spaceship = await _spaceshipService.GetAsync(transportDTO.SpaceshipId);
-            var startingLocation = await _planetService.GetAsync(transportDTO.StartingLocationId);
-            var endingLocation = await _planetService.GetAsync(transportDTO.EndingLocationId);
-
             var transport = _mapper.Map<Transport>(transportDTO);
-
-            transport.Spaceship = spaceship;
-            transport.StartingLocation = startingLocation;
-            transport.EndingLocation = endingLocation;
 
             if (await _transportService.RegisterNewAsync(transport))
             {
@@ -68,9 +60,9 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Marks transport as being loaded.
         /// </summary>
         [HttpPost("{id}/cargo_loading", Name = "CargoLoadingTransport")]
-        public async Task<ActionResult> CargoLoading(TransportCargoLoadingDTO transport)
+        public async Task<ActionResult> CargoLoading(Guid id)
         {
-            if (await _transportService.SetToCargoLoadingAsync(transport.Id))
+            if (await _transportService.SetToCargoLoadingAsync(id))
                 return Ok();
 
             return BadRequest();
@@ -80,9 +72,9 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Marks transport as being in flight.
         /// </summary>
         [HttpPost("{id}/in_flight", Name = "InFlightTransport")]
-        public async Task<ActionResult> InFlight(TransportInFlightDTO transport)
+        public async Task<ActionResult> InFlight(Guid id)
         {
-            if (await _transportService.SetToInFlightAsync(transport.Id))
+            if (await _transportService.SetToInFlightAsync(id))
                 return Ok();
 
             return BadRequest();
@@ -92,9 +84,9 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Marks transport as being unloaded.
         /// </summary>
         [HttpPost("{id}/cargo_unloading", Name = "CargoUnloadingTransport")]
-        public async Task<ActionResult> CargoUnloading(TransportCargoUnloadingDTO transport)
+        public async Task<ActionResult> CargoUnloading(Guid id)
         {
-            if (await _transportService.SetToCargoUnloadingAsync(transport.Id))
+            if (await _transportService.SetToCargoUnloadingAsync(id))
                 return Ok();
 
             return BadRequest();
@@ -104,9 +96,9 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Finishes a transport.
         /// </summary>
         [HttpPost("{id}/finish", Name = "FinishTransport")]
-        public async Task<ActionResult> Finish(TransportFinishDTO transport)
+        public async Task<ActionResult> Finish(Guid id)
         {
-            if (await _transportService.SetToFinishedAsync(transport.Id))
+            if (await _transportService.SetToFinishedAsync(id))
                 return Ok();
 
             return BadRequest();
@@ -116,9 +108,9 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Marks transport as lost.
         /// </summary>
         [HttpPost("{id}/lost", Name = "LostTransport")]
-        public async Task<ActionResult> Lost(TransportLostDTO transport)
+        public async Task<ActionResult> Lost(Guid id)
         {
-            if (await _transportService.SetToLostAsync(transport.Id))
+            if (await _transportService.SetToLostAsync(id))
                 return Ok();
 
             return BadRequest();
@@ -128,9 +120,9 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Cancels a transport.
         /// </summary>
         [HttpPost("{id}/cancel", Name = "CancelTransport")]
-        public async Task<ActionResult> Cancel(TransportCancelDTO transport)
+        public async Task<ActionResult> Cancel(Guid id)
         {
-            if (await _transportService.CancelAsync(transport.Id))
+            if (await _transportService.CancelAsync(id))
                 return Ok();
 
             return BadRequest();

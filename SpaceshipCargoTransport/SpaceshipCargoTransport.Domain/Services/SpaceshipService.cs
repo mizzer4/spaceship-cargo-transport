@@ -19,9 +19,9 @@ namespace SpaceshipCargoTransport.Domain.Services
             return _spaceshipRepository.CreateAsync(ship);
         }
 
-        public Task<bool> DeleteAsync(Spaceship ship)
+        public Task<bool> DeleteAsync(Guid id)
         {
-            return _spaceshipRepository.DeleteAsync(ship);
+            return _spaceshipRepository.DeleteAsync(id);
         }
 
         public Task<Spaceship?> GetAsync(Guid id)

@@ -17,9 +17,9 @@ namespace SpaceshipCargoTransport.Domain.Services
             return _planetRepository.CreateAsync(planet);
         }
 
-        public Task<bool> DeleteAsync(Planet planet)
+        public Task<bool> DeleteAsync(Guid id)
         {
-            return _planetRepository.DeleteAsync(planet);
+            return _planetRepository.DeleteAsync(id);
         }
 
         public Task<Planet?> GetAsync(Guid id)

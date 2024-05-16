@@ -20,8 +20,16 @@ namespace SpaceshipCargoTransport.Persistence.Repositories
             return await SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteAsync(Planet planet)
+        public async Task<bool> DeleteAsync(Guid id)
         {
+            var planet = await _context.Planets
+                .Where(c => c.Id == id).FirstOrDefaultAsync();
+
+            if (planet == null)
+            {
+                return false;
+            }
+
             _context.Planets.Remove(planet);
             return await SaveChangesAsync();
         }

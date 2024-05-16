@@ -58,8 +58,7 @@ namespace SpaceshipCargoTransport.Application.Controllers
             {
                 var spaceshipReadDTO = _mapper.Map<SpaceshipReadDTO>(spaceship);
                 return CreatedAtRoute(nameof(GetSpaceship), new { id = spaceshipReadDTO.Id }, spaceshipReadDTO);
-            }
-                
+            }                
 
             return BadRequest();
         }
@@ -68,10 +67,19 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Updates a spaceship with given values.
         /// </summary>
         [HttpPut("{id}", Name = "UpdateSpaceship")]
-        public async Task<ActionResult<Spaceship>> UpdateSpaceship([FromBody] SpaceshipUpdateDTO spaceship)
+        public async Task<ActionResult<Spaceship>> UpdateSpaceship([FromQuery] Guid id, [FromBody] SpaceshipUpdateDTO spaceshipDTO)
         {
-            if (await _spaceshipService.UpdateAsync(_mapper.Map<Spaceship>(spaceship)))
+            var spaceship = await _spaceshipService.GetAsync(id);
+
+            if (spaceship == null)
+            {
+                return NotFound();
+            }
+
+            if (await _spaceshipService.UpdateAsync(_mapper.Map(spaceshipDTO, spaceship)))
+            {
                 return Ok();
+            }
 
             return BadRequest();
         }
@@ -80,10 +88,19 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Deletes a spaceship.
         /// </summary>
         [HttpDelete("{id}", Name = "DeleteSpaceship")]
-        public async Task<ActionResult> DeleteSpaceship([FromBody] SpaceshipDeleteDTO spaceship)
+        public async Task<ActionResult> DeleteSpaceship(Guid id)
         {
-            if (await _spaceshipService.DeleteAsync(_mapper.Map<Spaceship>(spaceship)))
+            var spaceship = await _spaceshipService.GetAsync(id);
+
+            if (spaceship == null)
+            {
+                return NotFound();
+            }
+
+            if (await _spaceshipService.DeleteAsync(id))
+            {
                 return Ok();
+            }
 
             return BadRequest();
         }

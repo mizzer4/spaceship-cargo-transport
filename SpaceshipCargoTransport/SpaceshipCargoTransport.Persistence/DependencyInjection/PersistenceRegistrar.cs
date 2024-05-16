@@ -21,7 +21,9 @@ namespace SpaceshipCargoTransport.Persistence.DependencyInjection
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
+            builder.RegisterType<PlanetRepository>().As<IPlanetRepository>();
             builder.RegisterType<SpaceshipRepository>().As<ISpaceshipRepository>();
+            builder.RegisterType<TransportRepository>().As<ITransportRepository>();
 
             builder.Register(c =>
             {

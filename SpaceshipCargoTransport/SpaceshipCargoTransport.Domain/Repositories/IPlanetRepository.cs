@@ -8,6 +8,6 @@ namespace SpaceshipCargoTransport.Domain.Repositories
         Task<IEnumerable<Planet>> GetAllAsync();
         Task<bool> CreateAsync(Planet planet);
         Task<bool> UpdateAsync(Planet planet);
-        Task<bool> DeleteAsync(Planet planet);
+        Task<bool> DeleteAsync(Guid id);
     }
 }

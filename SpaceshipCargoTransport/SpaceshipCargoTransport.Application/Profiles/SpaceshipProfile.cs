@@ -12,7 +12,6 @@ namespace SpaceshipCargoTransport.Application.Profiles
             CreateMap<Spaceship, SpaceshipReadDTO>();
             CreateMap<SpaceshipCreateDTO, Spaceship>();
             CreateMap<SpaceshipUpdateDTO, Spaceship>();
-            CreateMap<SpaceshipDeleteDTO, Spaceship>();
         }
     }
 }

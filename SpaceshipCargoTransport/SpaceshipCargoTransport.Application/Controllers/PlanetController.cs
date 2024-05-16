@@ -68,10 +68,19 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Updates a planet with given values.
         /// </summary>
         [HttpPut("{id}", Name = "UpdatePlanet")]
-        public async Task<ActionResult<Planet>> UpdatePlanet([FromBody] PlanetUpdateDTO planet)
+        public async Task<ActionResult<Planet>> UpdatePlanet([FromQuery] Guid id, [FromBody] PlanetUpdateDTO planetDTO)
         {
-            if (await _planetService.UpdateAsync(_mapper.Map<Planet>(planet)))
+            var planet = await _planetService.GetAsync(id);
+
+            if (planet == null)
+            {
+                return NotFound();
+            }
+
+            if (await _planetService.UpdateAsync(_mapper.Map(planetDTO, planet)))
+            {
                 return Ok();
+            }
 
             return BadRequest();
         }
@@ -80,11 +89,20 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Deletes a planet.
         /// </summary>
         [HttpDelete("{id}", Name = "DeletePlanet")]
-        public async Task<ActionResult> DeletePlanet([FromRoute] PlanetDeleteDTO planet)
+        public async Task<ActionResult> DeletePlanet(Guid id)
         {
-            if (await _planetService.DeleteAsync(_mapper.Map<Planet>(planet)))
-                return Ok();
+            var planet = await _planetService.GetAsync(id);
 
+            if (planet == null)
+            {
+                return NotFound();
+            }
+
+            if (await _planetService.DeleteAsync(id))
+            {
+                return Ok();
+            }
+ 
             return BadRequest();
         }
     }
