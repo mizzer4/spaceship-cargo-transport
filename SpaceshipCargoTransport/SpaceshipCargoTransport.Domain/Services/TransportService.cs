@@ -29,8 +29,7 @@ namespace SpaceshipCargoTransport.Domain.Services
 
             if (_transportValidator.IsValid(transport))
             {
-                await _transportRepository.CreateAsync(transport);
-                return true;
+                return await _transportRepository.CreateAsync(transport);
             }         
 
             return false;
@@ -38,27 +37,34 @@ namespace SpaceshipCargoTransport.Domain.Services
 
         public async Task<bool> SetToCargoLoadingAsync(Guid id)
         {
-            var transport = await GetAndSetStatus(id, TransportStatus.CargoLoading);
-            return transport != null;
+            var transport = await _transportRepository.GetAsync(id);
+            var isSuccessful = await SetStatus(transport, TransportStatus.CargoLoading);
+
+            return isSuccessful;
         }
 
         public async Task<bool> SetToInFlightAsync(Guid id)
         {
-            var transport = await GetAndSetStatus(id, TransportStatus.InFlight);
-            return transport != null;
+            var transport = await _transportRepository.GetAsync(id);
+            var isSuccessful = await SetStatus(transport, TransportStatus.InFlight);
+
+            return isSuccessful;
         }
 
         public async Task<bool> SetToCargoUnloadingAsync(Guid id)
         {
-            var transport = await GetAndSetStatus(id, TransportStatus.CargoUnloading);
-            return transport != null;
+            var transport = await _transportRepository.GetAsync(id);
+            var isSuccessful = await SetStatus(transport, TransportStatus.CargoUnloading);
+
+            return isSuccessful;
         }
 
         public async Task<bool> SetToFinishedAsync(Guid id)
         {
-            var transport = await GetAndSetStatus(id, TransportStatus.Finished);
+            var transport = await _transportRepository.GetAsync(id);
+            var isSuccessful = await SetStatus(transport, TransportStatus.Finished);
 
-            if (transport != null)
+            if (isSuccessful)
             {
                 _notificationService.NotifyFinished(transport);
                 return true;
@@ -69,9 +75,10 @@ namespace SpaceshipCargoTransport.Domain.Services
 
         public async Task<bool> SetToLostAsync(Guid id)
         {
-            var transport = await GetAndSetStatus(id, TransportStatus.Lost);
+            var transport = await _transportRepository.GetAsync(id);
+            var isSuccessful = await SetStatus(transport, TransportStatus.Lost);
 
-            if (transport != null)
+            if (isSuccessful)
             {
                 _notificationService.NotifyLost(transport);
                 return true;
@@ -82,9 +89,10 @@ namespace SpaceshipCargoTransport.Domain.Services
 
         public async Task<bool> CancelAsync(Guid id)
         {
-            var transport = await GetAndSetStatus(id, TransportStatus.Cancelled);
+            var transport = await _transportRepository.GetAsync(id);
+            var isSuccessful = await SetStatus(transport, TransportStatus.Cancelled);
 
-            if (transport != null)
+            if (isSuccessful)
             {
                 _notificationService.NotifyCancelled(transport);
                 return true;
@@ -93,17 +101,15 @@ namespace SpaceshipCargoTransport.Domain.Services
             return false;
         }
 
-        private async Task<Transport?> GetAndSetStatus(Guid id, TransportStatus transportStatus)
+        private async Task<bool> SetStatus(Transport transport, TransportStatus transportStatus)
         {
-            var transport = await _transportRepository.GetAsync(id);
-
             if (transport != null)
             {
                 transport.Status = transportStatus;
-                await _transportRepository.UpdateAsync(transport);
+                return await _transportRepository.UpdateAsync(transport);
             }
 
-            return transport;
+            return false;
         }
     }
 }
