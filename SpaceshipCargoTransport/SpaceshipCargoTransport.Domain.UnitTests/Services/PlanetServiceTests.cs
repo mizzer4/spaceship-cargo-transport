@@ -54,13 +54,12 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
         public async Task DeleteAsync_ShouldReturnTrue_WhenDeletionIsSuccessful()
         {
             // given
-            var fixture = new Fixture();
-            var planet = fixture.Build<Planet>().Create();
+            var planetId = new Guid();
 
-            planetRepositoryMock.Setup(repo => repo.DeleteAsync(planet)).ReturnsAsync(true);
+            planetRepositoryMock.Setup(repo => repo.DeleteAsync(planetId)).ReturnsAsync(true);
 
             // when
-            var result = await planetService.DeleteAsync(planet);
+            var result = await planetService.DeleteAsync(planetId);
 
             // then
             result.Should().BeTrue();
@@ -70,13 +69,12 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
         public async Task DeleteAsync_ShouldReturnFalse_WhenDeletionIsUnsuccessful()
         {
             // given
-            var fixture = new Fixture();
-            var planet = fixture.Build<Planet>().Create();
+            var planetId = new Guid();
 
-            planetRepositoryMock.Setup(repo => repo.DeleteAsync(planet)).ReturnsAsync(false);
+            planetRepositoryMock.Setup(repo => repo.DeleteAsync(planetId)).ReturnsAsync(false);
 
             // when
-            var result = await planetService.DeleteAsync(planet);
+            var result = await planetService.DeleteAsync(planetId);
 
             // then
             result.Should().BeFalse();
