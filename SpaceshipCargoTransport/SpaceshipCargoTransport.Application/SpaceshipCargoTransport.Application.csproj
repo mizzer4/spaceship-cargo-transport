@@ -17,13 +17,17 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.18">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpaceshipCargoTransport.Persistence\SpaceshipCargoTransport.Persistence.csproj" />
     <ProjectReference Include="..\SpaceshipCargoTransport.Domain\SpaceshipCargoTransport.Domain.csproj" />
+    <ProjectReference Include="..\SpaceshipCargoTransport.Persistence\SpaceshipCargoTransport.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

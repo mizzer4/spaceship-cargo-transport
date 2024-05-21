@@ -29,6 +29,7 @@ namespace SpaceshipCargoTransport.Persistence.DependencyInjection
             {
                 var opt = new DbContextOptionsBuilder<AppDbContext>();
 
+                // TODO
                 if (environment == "Development")
                 {
                     opt.UseInMemoryDatabase("InMem");
