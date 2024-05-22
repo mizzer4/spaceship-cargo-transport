@@ -23,6 +23,7 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Returns all planets.
         /// </summary>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<PlanetReadDTO>>> GetAllPlanets()
         {
             var planets = await _planetService.GetAllAsync();
@@ -34,6 +35,8 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Returns single planet with provided id.
         /// </summary>
         [HttpGet("{id}", Name = "GetPlanet")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PlanetReadDTO>> GetPlanet(Guid id)
         {
             var planet = await _planetService.GetAsync(id);
@@ -50,6 +53,8 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Creates a planet with provided values.
         /// </summary>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<PlanetReadDTO>> Create([FromBody] PlanetCreateDTO PlanetDTO)
         {
             var planet = _mapper.Map<Planet>(PlanetDTO);
@@ -68,6 +73,9 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Updates a planet with given values.
         /// </summary>
         [HttpPut("{id}", Name = "UpdatePlanet")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Planet>> UpdatePlanet([FromQuery] Guid id, [FromBody] PlanetUpdateDTO planetDTO)
         {
             var planet = await _planetService.GetAsync(id);
@@ -89,6 +97,9 @@ namespace PlanetCargoTransport.Application.Controllers
         /// Deletes a planet.
         /// </summary>
         [HttpDelete("{id}", Name = "DeletePlanet")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeletePlanet(Guid id)
         {
             var planet = await _planetService.GetAsync(id);

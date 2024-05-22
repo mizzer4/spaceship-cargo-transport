@@ -23,6 +23,7 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Returns all spaceships.
         /// </summary>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<SpaceshipReadDTO>>> GetAllSpaceships()
         {
             var spaceships = await _spaceshipService.GetAllAsync();
@@ -34,6 +35,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Returns single spaceship with provided id.
         /// </summary>
         [HttpGet("{id}", Name = "GetSpaceship")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<SpaceshipReadDTO>> GetSpaceship(Guid id)
         {
             var spaceship = await _spaceshipService.GetAsync(id);
@@ -50,6 +53,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Creates a spaceship with provided values.
         /// </summary>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<SpaceshipReadDTO>> CreateSpaceship([FromBody] SpaceshipCreateDTO spaceshipDTO)
         {
             var spaceship = _mapper.Map<Spaceship>(spaceshipDTO);
@@ -67,6 +72,9 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Updates a spaceship with given values.
         /// </summary>
         [HttpPut("{id}", Name = "UpdateSpaceship")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Spaceship>> UpdateSpaceship([FromQuery] Guid id, [FromBody] SpaceshipUpdateDTO spaceshipDTO)
         {
             var spaceship = await _spaceshipService.GetAsync(id);
@@ -88,6 +96,9 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Deletes a spaceship.
         /// </summary>
         [HttpDelete("{id}", Name = "DeleteSpaceship")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteSpaceship(Guid id)
         {
             var spaceship = await _spaceshipService.GetAsync(id);

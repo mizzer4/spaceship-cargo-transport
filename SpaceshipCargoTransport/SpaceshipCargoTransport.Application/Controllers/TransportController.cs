@@ -27,6 +27,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Returns single transport with provided id.
         /// </summary>
         [HttpGet("{id}", Name = "GetTransport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TransportReadDTO>> GetTransport(Guid id)
         {
             var transport = await _transportService.GetDetailsAsync(id);
@@ -43,6 +45,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Creates a transport with provided values.
         /// </summary>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<TransportReadDTO>> Create([FromBody] TransportCreateDTO transportDTO)
         {
             var transport = _mapper.Map<Transport>(transportDTO);
@@ -60,6 +64,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Marks transport as being loaded.
         /// </summary>
         [HttpPost("{id}/cargo_loading", Name = "CargoLoadingTransport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CargoLoading(Guid id)
         {
             if (await _transportService.SetToCargoLoadingAsync(id))
@@ -72,6 +78,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Marks transport as being in flight.
         /// </summary>
         [HttpPost("{id}/in_flight", Name = "InFlightTransport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> InFlight(Guid id)
         {
             if (await _transportService.SetToInFlightAsync(id))
@@ -84,6 +92,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Marks transport as being unloaded.
         /// </summary>
         [HttpPost("{id}/cargo_unloading", Name = "CargoUnloadingTransport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CargoUnloading(Guid id)
         {
             if (await _transportService.SetToCargoUnloadingAsync(id))
@@ -96,6 +106,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Finishes a transport.
         /// </summary>
         [HttpPost("{id}/finish", Name = "FinishTransport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Finish(Guid id)
         {
             if (await _transportService.SetToFinishedAsync(id))
@@ -108,6 +120,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Marks transport as lost.
         /// </summary>
         [HttpPost("{id}/lost", Name = "LostTransport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Lost(Guid id)
         {
             if (await _transportService.SetToLostAsync(id))
@@ -120,6 +134,8 @@ namespace SpaceshipCargoTransport.Application.Controllers
         /// Cancels a transport.
         /// </summary>
         [HttpPost("{id}/cancel", Name = "CancelTransport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Cancel(Guid id)
         {
             if (await _transportService.CancelAsync(id))
