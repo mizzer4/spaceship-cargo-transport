@@ -1,9 +1,12 @@
 using AutoFixture;
+using AutoFixture.Dsl;
 using FluentAssertions;
 using Moq;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Repositories;
 using SpaceshipCargoTransport.Domain.Services;
+using System.Numerics;
+using Xunit;
 
 namespace SpaceshipCargoTransport.Domain.UnitTests.Services
 {
@@ -11,156 +14,101 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
     {
         private readonly Mock<IPlanetRepository> planetRepositoryMock;
         private readonly PlanetService planetService;
+        private readonly ICustomizationComposer<Planet> planetComposer;
 
         public PlanetServiceTests()
         {
             planetRepositoryMock = new Mock<IPlanetRepository>();
             planetService = new PlanetService(planetRepositoryMock.Object);
+
+            var fixture = new Fixture();
+            planetComposer = fixture.Build<Planet>();
         }
 
-        [Fact]
-        public async Task CreateAsync_ShouldReturnTrue_WhenCreationIsSuccessful()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task CreateAsync_ShouldReturnCorrectValue_WhenCreationIsFinished(bool returnValue)
         {
             // given
-            var fixture = new Fixture();
-            var planet = fixture.Build<Planet>().Create();
-
-            planetRepositoryMock.Setup(repo => repo.CreateAsync(planet)).ReturnsAsync(true);
+            var planet = planetComposer.Create();
+            planetRepositoryMock.Setup(repo => repo.CreateAsync(planet)).ReturnsAsync(returnValue);
 
             // when
             var result = await planetService.CreateAsync(planet);
 
             // then
-            result.Should().BeTrue();
+            result.Should().Be(returnValue);
         }
 
-        [Fact]
-        public async Task CreateAsync_ShouldReturnFalse_WhenCreationIsUnsuccessful()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task DeleteAsync_ShouldReturnCorrectValue_WhenDeletionIsFinished(bool returnValue)
         {
             // given
-            var fixture = new Fixture();
-            var planet = fixture.Build<Planet>().Create();
-
-            planetRepositoryMock.Setup(repo => repo.CreateAsync(planet)).ReturnsAsync(false);
-
-            // when
-            var result = await planetService.CreateAsync(planet);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task DeleteAsync_ShouldReturnTrue_WhenDeletionIsSuccessful()
-        {
-            // given
-            var planetId = new Guid();
-
-            planetRepositoryMock.Setup(repo => repo.DeleteAsync(planetId)).ReturnsAsync(true);
+            var planetId = Guid.NewGuid();
+            planetRepositoryMock.Setup(repo => repo.DeleteAsync(planetId)).ReturnsAsync(returnValue);
 
             // when
             var result = await planetService.DeleteAsync(planetId);
 
             // then
-            result.Should().BeTrue();
+            result.Should().Be(returnValue);
         }
 
-        [Fact]
-        public async Task DeleteAsync_ShouldReturnFalse_WhenDeletionIsUnsuccessful()
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task UpdateAsync_ShouldReturnCorrectValue_WhenUpdateIsFinished(bool returnValue)
         {
             // given
-            var planetId = new Guid();
-
-            planetRepositoryMock.Setup(repo => repo.DeleteAsync(planetId)).ReturnsAsync(false);
-
-            // when
-            var result = await planetService.DeleteAsync(planetId);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task UpdateAsync_ShouldReturnTrue_WhenDeletionIsSuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var planet = fixture.Build<Planet>().Create();
-
-            var planetRepositoryMock = new Mock<IPlanetRepository>();
-            planetRepositoryMock.Setup(repo => repo.UpdateAsync(planet)).ReturnsAsync(true);
-
-            var planetService = new PlanetService(planetRepositoryMock.Object);
+            var planet = planetComposer.Create();
+            planetRepositoryMock.Setup(repo => repo.UpdateAsync(planet)).ReturnsAsync(returnValue);
 
             // when
             var result = await planetService.UpdateAsync(planet);
 
             // then
-            result.Should().BeTrue();
+            result.Should().Be(returnValue);
         }
 
-        [Fact]
-        public async Task UpdateAsync_ShouldReturnFalse_WhenDeletionIsUnsuccessful()
+        [Theory]
+        [ClassData(typeof(PlanetTestData))]
+        public async Task GetAsync_ShouldReturnPlanetOrNull_WhenGuidIsProvided(Planet? planet, Planet? expectedResult)
         {
             // given
-            var fixture = new Fixture();
-            var planet = fixture.Build<Planet>().Create();
-
-            var planetRepositoryMock = new Mock<IPlanetRepository>();
-            planetRepositoryMock.Setup(repo => repo.UpdateAsync(planet)).ReturnsAsync(false);
-
-            var planetService = new PlanetService(planetRepositoryMock.Object);
-
-            // when
-            var result = await planetService.UpdateAsync(planet);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task GetAsync_ShouldReturnPlanet_WhenCorrectGuidIsProvided()
-        {
-            // given
-            var fixture = new Fixture();
-            var planet = fixture.Build<Planet>().Create();
             var guid = Guid.NewGuid();
-
             planetRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(planet);
 
             // when
             var result = await planetService.GetAsync(guid);
 
             // then
-            result.Should().Be(planet);
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task GetAsync_ShouldReturnNull_WhenIncorrectGuidIsProvided()
+        public class PlanetTestData : TheoryData<Planet?, Planet?>
         {
-            // given
-            var fixture = new Fixture();
-            Planet planet = null;
-            var guid = Guid.NewGuid();           
+            public PlanetTestData()
+            {
+                var fixture = new Fixture();
+                var planet = fixture.Build<Planet>().Create();                
 
-            planetRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(planet);
-
-            // when
-            var result = await planetService.GetAsync(guid);
-
-            // then
-            result.Should().BeNull();
+                Add(planet, planet);
+                Add(null, null);
+            }
         }
 
         [Fact]
         public async Task GetAllAsync_ShouldReturnAllPlanets()
         {
             // given
-            var fixture = new Fixture();
             var planets = new List<Planet>
             {
-                    fixture.Build<Planet>().Create(),
-                    fixture.Build<Planet>().Create()
+                    planetComposer.Create(),
+                    planetComposer.Create()
             };
 
             planetRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(planets);
