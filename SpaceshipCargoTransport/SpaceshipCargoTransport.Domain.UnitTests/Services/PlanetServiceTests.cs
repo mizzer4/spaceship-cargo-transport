@@ -5,8 +5,6 @@ using Moq;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Repositories;
 using SpaceshipCargoTransport.Domain.Services;
-using System.Numerics;
-using Xunit;
 
 namespace SpaceshipCargoTransport.Domain.UnitTests.Services
 {

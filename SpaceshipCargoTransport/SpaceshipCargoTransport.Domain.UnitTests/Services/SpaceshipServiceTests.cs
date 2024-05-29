@@ -1,4 +1,5 @@
 using AutoFixture;
+using AutoFixture.Dsl;
 using FluentAssertions;
 using Moq;
 using SpaceshipCargoTransport.Domain.Models;
@@ -7,169 +8,114 @@ using SpaceshipCargoTransport.Domain.Services;
 
 namespace SpaceshipCargoTransport.Domain.UnitTests.Services
 {
-    public class SpaceshipServiceTests
+    public class spaceshipServiceTests
     {
         private readonly Mock<ISpaceshipRepository> spaceshipRepositoryMock;
         private readonly SpaceshipService spaceshipService;
+        private readonly ICustomizationComposer<Spaceship> spaceshipComposer;
 
-        public SpaceshipServiceTests()
+        public spaceshipServiceTests()
         {
             spaceshipRepositoryMock = new Mock<ISpaceshipRepository>();
             spaceshipService = new SpaceshipService(spaceshipRepositoryMock.Object);
+
+            var fixture = new Fixture();
+            spaceshipComposer = fixture.Build<Spaceship>();
         }
 
-        [Fact]
-        public async Task CreateAsync_ShouldReturnTrue_WhenCreationIsSuccessful()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task CreateAsync_ShouldReturnCorrectValue_WhenCreationIsFinished(bool returnValue)
         {
             // given
-            var fixture = new Fixture();
-            var spaceship = fixture.Build<Spaceship>().Create();
-
-            spaceshipRepositoryMock.Setup(repo => repo.CreateAsync(spaceship)).ReturnsAsync(true);
+            var Spaceship = spaceshipComposer.Create();
+            spaceshipRepositoryMock.Setup(repo => repo.CreateAsync(Spaceship)).ReturnsAsync(returnValue);
 
             // when
-            var result = await spaceshipService.CreateAsync(spaceship);
+            var result = await spaceshipService.CreateAsync(Spaceship);
 
             // then
-            result.Should().BeTrue();
+            result.Should().Be(returnValue);
         }
 
-        [Fact]
-        public async Task CreateAsync_ShouldReturnFalse_WhenCreationIsUnsuccessful()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task DeleteAsync_ShouldReturnCorrectValue_WhenDeletionIsFinished(bool returnValue)
         {
             // given
-            var fixture = new Fixture();
-            var spaceship = fixture.Build<Spaceship>().Create();
-
-            spaceshipRepositoryMock.Setup(repo => repo.CreateAsync(spaceship)).ReturnsAsync(false);
-
-            // when
-            var result = await spaceshipService.CreateAsync(spaceship);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task DeleteAsync_ShouldReturnTrue_WhenDeletionIsSuccessful()
-        {
-            // given
-            var spaceshipId = new Guid();
-
-            spaceshipRepositoryMock.Setup(repo => repo.DeleteAsync(spaceshipId)).ReturnsAsync(true);
+            var spaceshipId = Guid.NewGuid();
+            spaceshipRepositoryMock.Setup(repo => repo.DeleteAsync(spaceshipId)).ReturnsAsync(returnValue);
 
             // when
             var result = await spaceshipService.DeleteAsync(spaceshipId);
 
             // then
-            result.Should().BeTrue();
+            result.Should().Be(returnValue);
         }
 
-        [Fact]
-        public async Task DeleteAsync_ShouldReturnFalse_WhenDeletionIsUnsuccessful()
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task UpdateAsync_ShouldReturnCorrectValue_WhenUpdateIsFinished(bool returnValue)
         {
             // given
-            var spaceshipId = new Guid();
-
-            spaceshipRepositoryMock.Setup(repo => repo.DeleteAsync(spaceshipId)).ReturnsAsync(false);
+            var Spaceship = spaceshipComposer.Create();
+            spaceshipRepositoryMock.Setup(repo => repo.UpdateAsync(Spaceship)).ReturnsAsync(returnValue);
 
             // when
-            var result = await spaceshipService.DeleteAsync(spaceshipId);
+            var result = await spaceshipService.UpdateAsync(Spaceship);
 
             // then
-            result.Should().BeFalse();
+            result.Should().Be(returnValue);
         }
 
-        [Fact]
-        public async Task UpdateAsync_ShouldReturnTrue_WhenDeletionIsSuccessful()
+        [Theory]
+        [ClassData(typeof(SpaceshipTestData))]
+        public async Task GetAsync_ShouldReturnSpaceshipOrNull_WhenGuidIsProvided(Spaceship? Spaceship, Spaceship? expectedResult)
         {
             // given
-            var fixture = new Fixture();
-            var spaceship = fixture.Build<Spaceship>().Create();
-
-            var spaceshipRepositoryMock = new Mock<ISpaceshipRepository>();
-            spaceshipRepositoryMock.Setup(repo => repo.UpdateAsync(spaceship)).ReturnsAsync(true);
-
-            var spaceshipService = new SpaceshipService(spaceshipRepositoryMock.Object);
-
-            // when
-            var result = await spaceshipService.UpdateAsync(spaceship);
-
-            // then
-            result.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task UpdateAsync_ShouldReturnFalse_WhenDeletionIsUnsuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var spaceship = fixture.Build<Spaceship>().Create();
-
-            var spaceshipRepositoryMock = new Mock<ISpaceshipRepository>();
-            spaceshipRepositoryMock.Setup(repo => repo.UpdateAsync(spaceship)).ReturnsAsync(false);
-
-            var spaceshipService = new SpaceshipService(spaceshipRepositoryMock.Object);
-
-            // when
-            var result = await spaceshipService.UpdateAsync(spaceship);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task GetAsync_ShouldReturnspaceship_WhenCorrectGuidIsProvided()
-        {
-            // given
-            var fixture = new Fixture();
-            var spaceship = fixture.Build<Spaceship>().Create();
             var guid = Guid.NewGuid();
-
-            spaceshipRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(spaceship);
+            spaceshipRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(Spaceship);
 
             // when
             var result = await spaceshipService.GetAsync(guid);
 
             // then
-            result.Should().Be(spaceship);
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task GetAsync_ShouldReturnNull_WhenIncorrectGuidIsProvided()
+        public class SpaceshipTestData : TheoryData<Spaceship?, Spaceship?>
         {
-            // given
-            var fixture = new Fixture();
-            Spaceship spaceship = null;
-            var guid = Guid.NewGuid();           
+            public SpaceshipTestData()
+            {
+                var fixture = new Fixture();
+                var Spaceship = fixture.Build<Spaceship>().Create();
 
-            spaceshipRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(spaceship);
-
-            // when
-            var result = await spaceshipService.GetAsync(guid);
-
-            // then
-            result.Should().BeNull();
+                Add(Spaceship, Spaceship);
+                Add(null, null);
+            }
         }
 
         [Fact]
         public async Task GetAllAsync_ShouldReturnAllSpaceships()
         {
             // given
-            var fixture = new Fixture();
-            var spaceships = new List<Spaceship>
+            var Spaceships = new List<Spaceship>
             {
-                    fixture.Build<Spaceship>().Create(),
-                    fixture.Build<Spaceship>().Create()
+                    spaceshipComposer.Create(),
+                    spaceshipComposer.Create()
             };
 
-            spaceshipRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(spaceships);
+            spaceshipRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(Spaceships);
 
             // when
             var result = await spaceshipService.GetAllAsync();
 
             // then
-            result.Should().BeEquivalentTo(spaceships);
+            result.Should().BeEquivalentTo(Spaceships);
         }
     }
 }
