@@ -11,13 +11,13 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
     public class PlanetServiceTests
     {
         private readonly Mock<IPlanetRepository> planetRepositoryMock;
-        private readonly PlanetService planetService;
+        private readonly PlanetService sut;
         private readonly ICustomizationComposer<Planet> planetComposer;
 
         public PlanetServiceTests()
         {
             planetRepositoryMock = new Mock<IPlanetRepository>();
-            planetService = new PlanetService(planetRepositoryMock.Object);
+            sut = new PlanetService(planetRepositoryMock.Object);
 
             var fixture = new Fixture();
             planetComposer = fixture.Build<Planet>();
@@ -33,7 +33,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             planetRepositoryMock.Setup(repo => repo.CreateAsync(planet)).ReturnsAsync(returnValue);
 
             // when
-            var result = await planetService.CreateAsync(planet);
+            var result = await sut.CreateAsync(planet);
 
             // then
             result.Should().Be(returnValue);
@@ -49,7 +49,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             planetRepositoryMock.Setup(repo => repo.DeleteAsync(planetId)).ReturnsAsync(returnValue);
 
             // when
-            var result = await planetService.DeleteAsync(planetId);
+            var result = await sut.DeleteAsync(planetId);
 
             // then
             result.Should().Be(returnValue);
@@ -66,7 +66,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             planetRepositoryMock.Setup(repo => repo.UpdateAsync(planet)).ReturnsAsync(returnValue);
 
             // when
-            var result = await planetService.UpdateAsync(planet);
+            var result = await sut.UpdateAsync(planet);
 
             // then
             result.Should().Be(returnValue);
@@ -81,7 +81,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             planetRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(planet);
 
             // when
-            var result = await planetService.GetAsync(guid);
+            var result = await sut.GetAsync(guid);
 
             // then
             result.Should().Be(expectedResult);
@@ -112,7 +112,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             planetRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(planets);
 
             // when
-            var result = await planetService.GetAllAsync();
+            var result = await sut.GetAllAsync();
 
             // then
             result.Should().BeEquivalentTo(planets);

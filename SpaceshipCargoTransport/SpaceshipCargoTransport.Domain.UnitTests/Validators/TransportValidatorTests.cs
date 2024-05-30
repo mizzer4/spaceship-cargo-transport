@@ -1,4 +1,5 @@
 using AutoFixture;
+using AutoFixture.Dsl;
 using FluentAssertions;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Validators;
@@ -7,6 +8,22 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Validators
 {
     public class TransportValidatorTests
     {
+        private readonly TransportValidator sut;
+        private readonly ICustomizationComposer<Spaceship> spaceshipComposer;
+        private readonly ICustomizationComposer<Transport> transportComposer;
+        private readonly ICustomizationComposer<Planet> planetComposer;
+
+        public TransportValidatorTests() 
+        {
+            var fixture = new Fixture();
+
+            spaceshipComposer = fixture.Build<Spaceship>();
+            transportComposer = fixture.Build<Transport>();
+            planetComposer = fixture.Build<Planet>();
+
+            sut = fixture.Build<TransportValidator>().Create();
+        }
+
         [Theory]
         [InlineData(100, 80)]
         [InlineData(100, 100)]
@@ -14,19 +31,16 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Validators
         public void IsSpaceshipCargoSpaceEnough_ShouldReturnTrue_WhenCargoSpaceIsEnough(int cargoStorageSpace, int cargoSize)
         {
             // given
-            var fixture = new Fixture();
-            var spaceship = fixture.Build<Spaceship>()
+            var spaceship = spaceshipComposer
                 .With(x => x.CargoStorageSpace, cargoStorageSpace)
                 .Create();
-            var transport = fixture.Build<Transport>()
+            var transport = transportComposer
                 .With(x => x.CargoSize, cargoSize)
                 .With(x => x.Spaceship, spaceship)
                 .Create();
 
-            var validator = new TransportValidator();
-
             // when
-            var result = validator.IsSpaceshipCargoSpaceEnough(transport);
+            var result = sut.IsSpaceshipCargoSpaceEnough(transport);
 
             // then
             result.Should().BeTrue();
@@ -39,19 +53,16 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Validators
         public void IsSpaceshipCargoSpaceEnough_ShouldReturnFalse_WhenCargoSpaceIsNotEnough(int cargoStorageSpace, int cargoSize)
         {
             // given
-            var fixture = new Fixture();
-            var spaceship = fixture.Build<Spaceship>()
+            var spaceship = spaceshipComposer
                 .With(x => x.CargoStorageSpace, cargoStorageSpace)
                 .Create();
-            var transport = fixture.Build<Transport>()
+            var transport = transportComposer
                 .With(x => x.CargoSize, cargoSize)
                 .With(x => x.Spaceship, spaceship)
                 .Create();
 
-            var validator = new TransportValidator();
-
             // when
-            var result = validator.IsSpaceshipCargoSpaceEnough(transport);
+            var result = sut.IsSpaceshipCargoSpaceEnough(transport);
 
             // then
             result.Should().BeFalse();
@@ -61,19 +72,16 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Validators
         public void IsDestinationDifferentPlanet_ShouldReturnTrue_WhenDifferentPlanet()
         {
             // given
-            var fixture = new Fixture();
-            var planet1 = fixture.Build<Planet>().Create();
-            var planet2 = fixture.Build<Planet>().Create();
+            var planet1 = planetComposer.Create();
+            var planet2 = planetComposer.Create();
 
-            var transport = fixture.Build<Transport>()
+            var transport = transportComposer
                 .With(x => x.StartingLocation, planet1)
                 .With(x => x.EndingLocation, planet2)
                 .Create();
 
-            var validator = new TransportValidator();
-
             // when
-            var result = validator.IsDestinationDifferentPlanet(transport);
+            var result = sut.IsDestinationDifferentPlanet(transport);
 
             // then
             result.Should().BeTrue();
@@ -83,18 +91,15 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Validators
         public void IsDestinationDifferentPlanet_ShouldReturnFalse_WhenSamePlanet()
         {
             // given
-            var fixture = new Fixture();
-            var planet = fixture.Build<Planet>().Create();
+            var planet = planetComposer.Create();
 
-            var transport = fixture.Build<Transport>()
+            var transport = transportComposer
                 .With(x => x.StartingLocation, planet)
                 .With(x => x.EndingLocation, planet)
                 .Create();
 
-            var validator = new TransportValidator();
-
             // when
-            var result = validator.IsDestinationDifferentPlanet(transport);
+            var result = sut.IsDestinationDifferentPlanet(transport);
 
             // then
             result.Should().BeFalse();

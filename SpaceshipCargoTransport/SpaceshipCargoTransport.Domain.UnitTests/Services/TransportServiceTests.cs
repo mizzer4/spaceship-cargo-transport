@@ -6,6 +6,8 @@ using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Repositories;
 using SpaceshipCargoTransport.Domain.Validators;
 using SpaceshipCargoTransport.Domain.Notifications;
+using AutoFixture.AutoMoq;
+using AutoFixture.Dsl;
 
 namespace transportCargoTransport.Domain.UnitTests.Services
 {
@@ -13,15 +15,20 @@ namespace transportCargoTransport.Domain.UnitTests.Services
     {
         private readonly Mock<ITransportRepository> transportRepositoryMock;
         private readonly Mock<ITransportValidator> transportValidatorMock;
-        private readonly Mock<ITransportNotificationService> transportNotificationServiceMock;
-        private readonly TransportService transportService;
+        private readonly TransportService sut;
+        private readonly ICustomizationComposer<Transport> transportComposer; 
 
         public TransportServiceTests()
         {
-            transportRepositoryMock = new Mock<ITransportRepository>();
-            transportValidatorMock = new Mock<ITransportValidator>();
-            transportNotificationServiceMock = new Mock<ITransportNotificationService>();
-            transportService = new TransportService(transportRepositoryMock.Object, transportValidatorMock.Object, transportNotificationServiceMock.Object);
+            var fixture = new Fixture();
+            fixture.Customize(new AutoMoqCustomization());
+
+            transportComposer = fixture.Build<Transport>();
+
+            transportRepositoryMock = fixture.Freeze<Mock<ITransportRepository>>();
+            transportValidatorMock = fixture.Freeze<Mock<ITransportValidator>>();
+
+            sut = fixture.Build<TransportService>().Create();
         }
 
 
@@ -29,392 +36,154 @@ namespace transportCargoTransport.Domain.UnitTests.Services
         public async Task GetDetailsAsync_ShouldReturnTransport_WhenGuidProvided()
         {
             // given
-            var fixture = new Fixture();
-            var guid = new Guid();
-            var transport = fixture.Build<Transport>().Create();
+            var guid = Guid.NewGuid();
+            var transport = transportComposer.Create();
 
             transportRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(transport);
 
             // when
-            var result = await transportService.GetDetailsAsync(guid);
+            var result = await sut.GetDetailsAsync(guid);
 
             // then
             result.Should().Be(transport);
         }
 
-        [Fact]
-        public async Task RegisterNewAsync_ShouldReturnTrue_WhenCreationAndValidationIsSuccessful()
+        [Theory]
+        [InlineData(false, false, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, true, false)]
+        [InlineData(true, true, true)]
+        public async Task RegisterNewAsync_ShouldReturnTrue_WhenCreationAndValidationIsSuccessful(bool creationResult, bool validationResult, bool expectedResult)
         {
             // given
-            var fixture = new Fixture();
-            var transport = fixture.Build<Transport>().Create();
+            var transport = transportComposer.Create();
 
-            transportRepositoryMock.Setup(repo => repo.CreateAsync(transport)).ReturnsAsync(true);
-            transportValidatorMock.Setup(val => val.IsValid(transport)).Returns(true);
+            transportRepositoryMock.Setup(repo => repo.CreateAsync(transport)).ReturnsAsync(creationResult);
+            transportValidatorMock.Setup(val => val.IsValid(transport)).Returns(validationResult);
 
             // when
-            var result = await transportService.RegisterNewAsync(transport);
+            var result = await sut.RegisterNewAsync(transport);
 
             // then
-            result.Should().BeTrue();
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task RegisterNewAsync_ShouldReturnFalse_WhenCreationIsUnsuccessful()
+        public class TransportTestData : TheoryData<Transport?, bool, bool>
         {
-            // given
-            var fixture = new Fixture();
-            var transport = fixture.Build<Transport>().Create();
+            public TransportTestData()
+            {
+                var fixture = new Fixture();
+                var Transport = fixture.Build<Transport>().Create();
 
-            transportRepositoryMock.Setup(repo => repo.CreateAsync(transport)).ReturnsAsync(false);
-            transportValidatorMock.Setup(val => val.IsValid(transport)).Returns(true);
-
-            // when
-            var result = await transportService.RegisterNewAsync(transport);
-
-            // then
-            result.Should().BeFalse();
+                Add(Transport, false, false);
+                Add(Transport, true, true);
+                Add(null, false, false);
+            }
         }
 
-        [Fact]
-        public async Task RegisterNewAsync_ShouldReturnFalse_WhenValidationIsUnsuccessful()
+        [Theory]
+        [ClassData(typeof(TransportTestData))]
+        public async Task SetToCargoLoadingAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful(Transport? transport, bool updateResult, bool expectedResult)
         {
             // given
-            var fixture = new Fixture();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.CreateAsync(transport)).ReturnsAsync(true);
-            transportValidatorMock.Setup(val => val.IsValid(transport)).Returns(false);
-
-            // when
-            var result = await transportService.RegisterNewAsync(transport);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task SetToCargoLoadingAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
+            var transportId = Guid.NewGuid();
 
             transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
+            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(updateResult);
 
             // when
-            var result = await transportService.SetToCargoLoadingAsync(transportId);
+            var result = await sut.SetToCargoLoadingAsync(transportId);
 
             // then
-            result.Should().BeTrue();
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task SetToCargoLoadingAsync_ShouldReturnFalse_WhenTransportIsNotFound()
+
+        [Theory]
+        [ClassData(typeof(TransportTestData))]
+        public async Task SetToInFlightAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful(Transport? transport, bool updateResult, bool expectedResult)
         {
             // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            Transport transport = null;
+            var transportId = Guid.NewGuid();
 
             transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
+            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(updateResult);
 
             // when
-            var result = await transportService.SetToCargoLoadingAsync(transportId);
+            var result = await sut.SetToInFlightAsync(transportId);
 
             // then
-            result.Should().BeFalse();
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task SetToCargoLoadingAsync_ShouldReturnFalse_WhenStatusChangeIsUnsuccessful()
+        [Theory]
+        [ClassData(typeof(TransportTestData))]
+        public async Task SetToCargoUnloadingAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful(Transport? transport, bool updateResult, bool expectedResult)
         {
             // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
+            var transportId = Guid.NewGuid();
 
             transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(false);
+            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(updateResult);
 
             // when
-            var result = await transportService.SetToCargoLoadingAsync(transportId);
+            var result = await sut.SetToCargoUnloadingAsync(transportId);
 
             // then
-            result.Should().BeFalse();
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task SetToInFlightAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful()
+        [Theory]
+        [ClassData(typeof(TransportTestData))]
+        public async Task SetToFinishedAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful(Transport? transport, bool updateResult, bool expectedResult)
         {
             // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
+            var transportId = Guid.NewGuid();
 
             transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
+            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(updateResult);
 
             // when
-            var result = await transportService.SetToInFlightAsync(transportId);
+            var result = await sut.SetToFinishedAsync(transportId);
 
             // then
-            result.Should().BeTrue();
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task SetToInFlightAsync_ShouldReturnFalse_WhenTransportIsNotFound()
+        [Theory]
+        [ClassData(typeof(TransportTestData))]
+        public async Task SetToLostAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful(Transport? transport, bool updateResult, bool expectedResult)
         {
             // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            Transport transport = null;
+            var transportId = Guid.NewGuid();
 
             transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
+            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(updateResult);
 
             // when
-            var result = await transportService.SetToInFlightAsync(transportId);
+            var result = await sut.SetToLostAsync(transportId);
 
             // then
-            result.Should().BeFalse();
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task SetToInFlightAsync_ShouldReturnFalse_WhenStatusChangeIsUnsuccessful()
+
+        [Theory]
+        [ClassData(typeof(TransportTestData))]
+        public async Task CancelAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful(Transport? transport, bool updateResult, bool expectedResult)
         {
             // given
-            var fixture = new Fixture();
             var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
 
             transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(false);
+            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(updateResult);
 
             // when
-            var result = await transportService.SetToInFlightAsync(transportId);
+            var result = await sut.CancelAsync(transportId);
 
             // then
-            result.Should().BeFalse();
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public async Task SetToCargoUnloadingAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
-
-            // when
-            var result = await transportService.SetToCargoUnloadingAsync(transportId);
-
-            // then
-            result.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task SetToCargoUnloadingAsync_ShouldReturnFalse_WhenTransportIsNotFound()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            Transport transport = null;
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
-
-            // when
-            var result = await transportService.SetToCargoUnloadingAsync(transportId);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task SetToCargoUnloadingAsync_ShouldReturnFalse_WhenStatusChangeIsUnsuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(false);
-
-            // when
-            var result = await transportService.SetToCargoUnloadingAsync(transportId);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task SetToFinishedAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
-
-            // when
-            var result = await transportService.SetToFinishedAsync(transportId);
-
-            // then
-            result.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task SetToFinishedAsync_ShouldReturnFalse_WhenTransportIsNotFound()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            Transport transport = null;
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
-
-            // when
-            var result = await transportService.SetToFinishedAsync(transportId);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task SetToFinishedAsync_ShouldReturnFalse_WhenStatusChangeIsUnsuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(false);
-
-            // when
-            var result = await transportService.SetToFinishedAsync(transportId);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task SetToLostAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
-
-            // when
-            var result = await transportService.SetToLostAsync(transportId);
-
-            // then
-            result.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task SetToLostAsync_ShouldReturnFalse_WhenTransportIsNotFound()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            Transport transport = null;
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
-
-            // when
-            var result = await transportService.SetToLostAsync(transportId);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task SetToLostAsync_ShouldReturnFalse_WhenStatusChangeIsUnsuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(false);
-
-            // when
-            var result = await transportService.SetToLostAsync(transportId);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task CancelAsync_ShouldReturnTrue_WhenStatusChangeIsSuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
-
-            // when
-            var result = await transportService.CancelAsync(transportId);
-
-            // then
-            result.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task CancelAsync_ShouldReturnFalse_WhenTransportIsNotFound()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            Transport transport = null;
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(true);
-
-            // when
-            var result = await transportService.CancelAsync(transportId);
-
-            // then
-            result.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task CancelAsync_ShouldReturnFalse_WhenStatusChangeIsUnsuccessful()
-        {
-            // given
-            var fixture = new Fixture();
-            var transportId = new Guid();
-            var transport = fixture.Build<Transport>().Create();
-
-            transportRepositoryMock.Setup(repo => repo.GetAsync(transportId)).ReturnsAsync(transport);
-            transportRepositoryMock.Setup(repo => repo.UpdateAsync(transport)).ReturnsAsync(false);
-
-            // when
-            var result = await transportService.CancelAsync(transportId);
-
-            // then
-            result.Should().BeFalse();
-        }
     }
 }

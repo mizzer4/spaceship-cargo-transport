@@ -8,16 +8,16 @@ using SpaceshipCargoTransport.Domain.Services;
 
 namespace SpaceshipCargoTransport.Domain.UnitTests.Services
 {
-    public class spaceshipServiceTests
+    public class SpaceshipServiceTests
     {
         private readonly Mock<ISpaceshipRepository> spaceshipRepositoryMock;
-        private readonly SpaceshipService spaceshipService;
+        private readonly SpaceshipService sut;
         private readonly ICustomizationComposer<Spaceship> spaceshipComposer;
 
-        public spaceshipServiceTests()
+        public SpaceshipServiceTests()
         {
             spaceshipRepositoryMock = new Mock<ISpaceshipRepository>();
-            spaceshipService = new SpaceshipService(spaceshipRepositoryMock.Object);
+            sut = new SpaceshipService(spaceshipRepositoryMock.Object);
 
             var fixture = new Fixture();
             spaceshipComposer = fixture.Build<Spaceship>();
@@ -33,7 +33,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             spaceshipRepositoryMock.Setup(repo => repo.CreateAsync(Spaceship)).ReturnsAsync(returnValue);
 
             // when
-            var result = await spaceshipService.CreateAsync(Spaceship);
+            var result = await sut.CreateAsync(Spaceship);
 
             // then
             result.Should().Be(returnValue);
@@ -49,7 +49,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             spaceshipRepositoryMock.Setup(repo => repo.DeleteAsync(spaceshipId)).ReturnsAsync(returnValue);
 
             // when
-            var result = await spaceshipService.DeleteAsync(spaceshipId);
+            var result = await sut.DeleteAsync(spaceshipId);
 
             // then
             result.Should().Be(returnValue);
@@ -66,7 +66,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             spaceshipRepositoryMock.Setup(repo => repo.UpdateAsync(Spaceship)).ReturnsAsync(returnValue);
 
             // when
-            var result = await spaceshipService.UpdateAsync(Spaceship);
+            var result = await sut.UpdateAsync(Spaceship);
 
             // then
             result.Should().Be(returnValue);
@@ -81,7 +81,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             spaceshipRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(Spaceship);
 
             // when
-            var result = await spaceshipService.GetAsync(guid);
+            var result = await sut.GetAsync(guid);
 
             // then
             result.Should().Be(expectedResult);
@@ -112,7 +112,7 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
             spaceshipRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(Spaceships);
 
             // when
-            var result = await spaceshipService.GetAllAsync();
+            var result = await sut.GetAllAsync();
 
             // then
             result.Should().BeEquivalentTo(Spaceships);
