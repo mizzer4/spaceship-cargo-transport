@@ -5,7 +5,6 @@ using SpaceshipCargoTransport.Domain.Services;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Repositories;
 using SpaceshipCargoTransport.Domain.Validators;
-using SpaceshipCargoTransport.Domain.Notifications;
 using AutoFixture.AutoMoq;
 using AutoFixture.Dsl;
 

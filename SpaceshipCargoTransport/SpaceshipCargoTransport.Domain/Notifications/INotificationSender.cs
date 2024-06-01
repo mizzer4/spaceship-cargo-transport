@@ -4,6 +4,6 @@ namespace SpaceshipCargoTransport.Domain.Notifications
 {
     public interface INotificationSender
     {
-        public void Send(Transport transport, string message);
+        Task SendAsync(string recipient, string subject, string message);
     }
 }

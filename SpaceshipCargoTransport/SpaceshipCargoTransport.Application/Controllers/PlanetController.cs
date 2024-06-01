@@ -6,6 +6,9 @@ using SpaceshipCargoTransport.Domain.Services;
 
 namespace PlanetCargoTransport.Application.Controllers
 {
+    /// <summary>
+    /// Controller handling Planet endpoints.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class PlanetController : ControllerBase

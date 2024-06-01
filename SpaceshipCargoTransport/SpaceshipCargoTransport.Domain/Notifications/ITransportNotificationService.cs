@@ -4,8 +4,8 @@ namespace SpaceshipCargoTransport.Domain.Notifications
 {
     public interface ITransportNotificationService
     {
-        public void NotifyCancelled(Transport transport);
-        public void NotifyLost(Transport transport);
-        public void NotifyFinished(Transport transportId);
+        Task NotifyCancelled(Transport transport);
+        Task NotifyLost(Transport transport);
+        Task NotifyFinished(Transport transportId);
     }
 }

@@ -101,7 +101,7 @@ namespace SpaceshipCargoTransport.Domain.Services
             return false;
         }
 
-        private async Task<bool> SetStatus(Transport transport, TransportStatus transportStatus)
+        private async Task<bool> SetStatus(Transport? transport, TransportStatus transportStatus)
         {
             if (transport != null)
             {

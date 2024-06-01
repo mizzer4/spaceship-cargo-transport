@@ -11,25 +11,41 @@ namespace SpaceshipCargoTransport.Domain.Notifications
             _notificationSender = notificationSender;
         }
 
-        public void NotifyCancelled(Transport transport)
+        public Task NotifyCancelled(Transport transport)
         {
-            var message = $"";
+            var subject = BuildSubjectForStatus(transport, TransportStatus.Cancelled);
+            var message = BuildMessageForStatus(transport, TransportStatus.Cancelled);
+            var recipient = transport.Requestor;
 
-            _notificationSender.Send(transport, message);
+            return _notificationSender.SendAsync(subject, recipient, message);
         }
 
-        public void NotifyFinished(Transport transport)
+        public Task NotifyFinished(Transport transport)
         {
-            var message = $"";
+            var subject = BuildSubjectForStatus(transport, TransportStatus.Finished);
+            var message = BuildMessageForStatus(transport, TransportStatus.Finished);
+            var recipient = transport.Requestor;
 
-            _notificationSender.Send(transport, message);
+            return _notificationSender.SendAsync(subject, recipient, message);
         }
 
-        public void NotifyLost(Transport transport)
+        public Task NotifyLost(Transport transport)
         {
-            var message = $"";
+            var subject = BuildSubjectForStatus(transport, TransportStatus.Lost);
+            var message = BuildMessageForStatus(transport, TransportStatus.Lost);
+            var recipient = transport.Requestor;
 
-            _notificationSender.Send(transport, message);
+            return _notificationSender.SendAsync(subject, recipient, message);
+        }
+
+        private string BuildMessageForStatus(Transport transport, TransportStatus status) 
+        {
+            return $"Transport {transport.Id} of {transport.CargoSize} {transport.CargoType} by {transport.Spaceship.Name} has been {status}.";
+        }
+
+        private string BuildSubjectForStatus(Transport transport, TransportStatus status)
+        {
+            return $"Transport {transport.Id} has been {status}.";
         }
     }
 }

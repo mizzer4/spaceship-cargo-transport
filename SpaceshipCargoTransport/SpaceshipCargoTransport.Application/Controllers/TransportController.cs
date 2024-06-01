@@ -6,6 +6,9 @@ using SpaceshipCargoTransport.Domain.Services;
 
 namespace SpaceshipCargoTransport.Application.Controllers
 {
+    /// <summary>
+    /// Controller handling Transport endpoints.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class TransportController : ControllerBase
