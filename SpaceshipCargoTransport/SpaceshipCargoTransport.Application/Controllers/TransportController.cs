@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using SpaceshipCargoTransport.Application.Authentication;
 using SpaceshipCargoTransport.Application.DTOs.Transport;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Services;
@@ -9,6 +10,7 @@ namespace SpaceshipCargoTransport.Application.Controllers
     /// <summary>
     /// Controller handling Transport endpoints.
     /// </summary>
+    [ApiKey]
     [Route("api/[controller]")]
     [ApiController]
     public class TransportController : ControllerBase

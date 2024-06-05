@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Microsoft.OpenApi.Models;
 using SpaceshipCargoTransport.Persistence.DependencyInjection;
 using System.Reflection;
 
@@ -20,6 +21,29 @@ namespace SpaceshipCargoTransport.Application
             {
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+                c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter a valid ApiKey",
+                    Name = "X-API-Key",
+                    Type = SecuritySchemeType.ApiKey
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type=ReferenceType.SecurityScheme,
+                                Id="ApiKey"
+                            }
+                        },
+                        new string[]{}
+                    }
+                });
             });
             services.AddControllers();
         }

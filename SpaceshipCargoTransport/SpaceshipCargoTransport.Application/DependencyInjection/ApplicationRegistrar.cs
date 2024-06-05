@@ -1,6 +1,9 @@
 ﻿using Autofac;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Filters;
+using SpaceshipCargoTransport.Application.Authentication;
 using SpaceshipCargoTransport.Application.Profiles;
+using SpaceshipCargoTransport.Domain.Repositories;
 
 namespace SpaceshipCargoTransport.Persistence.DependencyInjection
 {
@@ -8,6 +11,9 @@ namespace SpaceshipCargoTransport.Persistence.DependencyInjection
     {
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<ApiKeyAuthorizationFilter>();
+            builder.RegisterType<ApiKeyValidator>().As<IApiKeyValidator>();
+
             builder.Register(ctx => new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new SpaceshipProfile());

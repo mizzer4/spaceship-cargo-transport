@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using SpaceshipCargoTransport.Application.Authentication;
 using SpaceshipCargoTransport.Application.DTOs.PlanetDTOs;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Services;
@@ -9,6 +10,7 @@ namespace PlanetCargoTransport.Application.Controllers
     /// <summary>
     /// Controller handling Planet endpoints.
     /// </summary>
+    [ApiKey]
     [Route("api/[controller]")]
     [ApiController]
     public class PlanetController : ControllerBase
@@ -24,7 +26,7 @@ namespace PlanetCargoTransport.Application.Controllers
 
         /// <summary>
         /// Returns all planets.
-        /// </summary>
+        /// </summary>       
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<PlanetReadDTO>>> GetAllPlanets()
@@ -36,7 +38,7 @@ namespace PlanetCargoTransport.Application.Controllers
 
         /// <summary>
         /// Returns single planet with provided id.
-        /// </summary>
+        /// </summary>       
         [HttpGet("{id}", Name = "GetPlanet")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -54,7 +56,7 @@ namespace PlanetCargoTransport.Application.Controllers
 
         /// <summary>
         /// Creates a planet with provided values.
-        /// </summary>
+        /// </summary>       
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,7 +76,7 @@ namespace PlanetCargoTransport.Application.Controllers
 
         /// <summary>
         /// Updates a planet with given values.
-        /// </summary>
+        /// </summary>        
         [HttpPut("{id}", Name = "UpdatePlanet")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
