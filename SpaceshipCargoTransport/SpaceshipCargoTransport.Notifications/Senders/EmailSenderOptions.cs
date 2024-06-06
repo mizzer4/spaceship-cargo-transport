@@ -1,6 +1,6 @@
 ﻿namespace SpaceshipCargoTransport.Notifications.Senders
 {
-    internal class EmailSenderOptions
+    public class EmailSenderOptions
     {
         public const string SectionName = "EmailSender";
 

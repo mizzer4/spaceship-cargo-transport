@@ -1,6 +1,6 @@
 ﻿namespace SpaceshipCargoTransport.Application.Authentication
 {
-    public class ApiKeyValidator : IApiKeyValidator
+    internal class ApiKeyValidator : IApiKeyValidator
     {
         public bool IsValid(string apiKey)
         {

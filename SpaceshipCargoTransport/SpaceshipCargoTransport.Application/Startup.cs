@@ -1,5 +1,7 @@
 ﻿using Autofac;
 using Microsoft.OpenApi.Models;
+using SpaceshipCargoTransport.Application.Authentication;
+using SpaceshipCargoTransport.Notifications.Senders;
 using SpaceshipCargoTransport.Persistence.DependencyInjection;
 using System.Reflection;
 
@@ -16,6 +18,10 @@ namespace SpaceshipCargoTransport.Application
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions()
+                .Configure<ApiKeyAuthorizationFilterOptions>(Configuration.GetSection(nameof(ApiKeyAuthorizationFilterOptions)))
+                .Configure<EmailSenderOptions>(Configuration.GetSection(nameof(EmailSenderOptions)));
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
@@ -26,7 +32,9 @@ namespace SpaceshipCargoTransport.Application
                 {
                     In = ParameterLocation.Header,
                     Description = "Please enter a valid ApiKey",
-                    Name = "X-API-Key",
+                    Name = Configuration
+                        .GetSection(nameof(ApiKeyAuthorizationFilterOptions))
+                        .Get<ApiKeyAuthorizationFilterOptions>().HeaderName,
                     Type = SecuritySchemeType.ApiKey
                 });
 

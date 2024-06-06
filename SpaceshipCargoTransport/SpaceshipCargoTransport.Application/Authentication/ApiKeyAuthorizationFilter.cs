@@ -1,16 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace SpaceshipCargoTransport.Application.Authentication
 {
-    public class ApiKeyAuthorizationFilter : IAuthorizationFilter
+    internal class ApiKeyAuthorizationFilter : IAuthorizationFilter
     {
-        private const string ApiKeyHeaderName = "X-API-Key";
+        private readonly string ApiKeyHeaderName;
 
         private readonly IApiKeyValidator _apiKeyValidator;
 
-        public ApiKeyAuthorizationFilter(IApiKeyValidator apiKeyValidator)
+        public ApiKeyAuthorizationFilter(IOptions<ApiKeyAuthorizationFilterOptions> options, IApiKeyValidator apiKeyValidator)
         {
+            ApiKeyHeaderName = options.Value.HeaderName;
             _apiKeyValidator = apiKeyValidator;
         }
 
