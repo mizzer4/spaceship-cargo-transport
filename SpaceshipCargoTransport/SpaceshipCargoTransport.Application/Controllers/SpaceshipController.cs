@@ -44,6 +44,7 @@ namespace SpaceshipCargoTransport.Application.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<SpaceshipReadDTO>> GetSpaceship(Guid id)
         {
+
             var spaceship = await _spaceshipService.GetAsync(id);
 
             if (spaceship == null)
@@ -51,7 +52,7 @@ namespace SpaceshipCargoTransport.Application.Controllers
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<SpaceshipReadDTO>(spaceship));
+            return Ok(spaceship);
         }
 
         /// <summary>
@@ -62,15 +63,14 @@ namespace SpaceshipCargoTransport.Application.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<SpaceshipReadDTO>> CreateSpaceship([FromBody] SpaceshipCreateDTO spaceshipDTO)
         {
-            var spaceship = _mapper.Map<Spaceship>(spaceshipDTO);
+            var spaceshipReadDTO = await _spaceshipService.CreateAsync(spaceshipDTO);
 
-            if (await _spaceshipService.CreateAsync(spaceship))
+            if (spaceshipReadDTO == null)
             {
-                var spaceshipReadDTO = _mapper.Map<SpaceshipReadDTO>(spaceship);
-                return CreatedAtRoute(nameof(GetSpaceship), new { id = spaceshipReadDTO.Id }, spaceshipReadDTO);
-            }                
+                return BadRequest();             
+            }
 
-            return BadRequest();
+            return CreatedAtRoute(nameof(GetSpaceship), new { id = spaceshipReadDTO.Id }, spaceshipReadDTO);
         }
 
         /// <summary>
@@ -89,12 +89,14 @@ namespace SpaceshipCargoTransport.Application.Controllers
                 return NotFound();
             }
 
-            if (await _spaceshipService.UpdateAsync(_mapper.Map(spaceshipDTO, spaceship)))
+            var isSuccessfull = await _spaceshipService.UpdateAsync(spaceshipDTO);
+
+            if (!isSuccessfull)
             {
-                return Ok();
+                return BadRequest();
             }
 
-            return BadRequest();
+            return Ok();
         }
 
         /// <summary>

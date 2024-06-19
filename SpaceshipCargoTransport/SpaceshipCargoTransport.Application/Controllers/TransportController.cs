@@ -54,15 +54,14 @@ namespace SpaceshipCargoTransport.Application.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<TransportReadDTO>> Create([FromBody] TransportCreateDTO transportDTO)
         {
-            var transport = _mapper.Map<Transport>(transportDTO);
+            var transportReadDTO = await _transportService.RegisterNewAsync(transportDTO);
 
-            if (await _transportService.RegisterNewAsync(transport))
+            if (transportReadDTO == null)
             {
-                var transportReadDTO = _mapper.Map<TransportReadDTO>(transport);
-                return CreatedAtRoute(nameof(GetTransport), new { id = transportReadDTO.Id }, transportReadDTO);
+                return BadRequest();              
             }
 
-            return BadRequest();
+            return CreatedAtRoute(nameof(GetTransport), new { id = transportReadDTO.Id }, transportReadDTO);
         }
 
         /// <summary>

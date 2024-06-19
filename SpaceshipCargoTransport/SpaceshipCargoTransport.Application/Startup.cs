@@ -59,7 +59,7 @@ namespace SpaceshipCargoTransport.Application
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterModule(new ApplicationRegistrar());
-            builder.RegisterModule(new DomainRegistrar());
+            builder.RegisterModule(new UseCasesRegistrar());
             builder.RegisterModule(new PersistenceRegistrar(Configuration));
         }
 

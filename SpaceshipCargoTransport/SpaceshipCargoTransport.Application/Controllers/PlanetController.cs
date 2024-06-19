@@ -4,6 +4,7 @@ using SpaceshipCargoTransport.Application.Authentication;
 using SpaceshipCargoTransport.Application.DTOs.PlanetDTOs;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Services;
+using System.Numerics;
 
 namespace PlanetCargoTransport.Application.Controllers
 {
@@ -16,12 +17,11 @@ namespace PlanetCargoTransport.Application.Controllers
     public class PlanetController : ControllerBase
     {
         private readonly IPlanetService _planetService;
-        private readonly IMapper _mapper;
 
-        public PlanetController(IPlanetService planetService, IMapper mapper)
+
+        public PlanetController(IPlanetService planetService)
         {
             _planetService = planetService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace PlanetCargoTransport.Application.Controllers
         {
             var planets = await _planetService.GetAllAsync();
 
-            return Ok(_mapper.Map<IEnumerable<PlanetReadDTO>>(planets));
+            return Ok(planets);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace PlanetCargoTransport.Application.Controllers
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<PlanetReadDTO>(planet));
+            return Ok(planet);
         }
 
         /// <summary>
@@ -62,16 +62,14 @@ namespace PlanetCargoTransport.Application.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<PlanetReadDTO>> Create([FromBody] PlanetCreateDTO PlanetDTO)
         {
-            var planet = _mapper.Map<Planet>(PlanetDTO);
+            var planetReadDTO = await _planetService.CreateAsync(PlanetDTO);
 
-            if (await _planetService.CreateAsync(planet))
+            if (planetReadDTO == null)
             {
-                var planetReadDTO = _mapper.Map<PlanetReadDTO>(planet);
-                return CreatedAtRoute(nameof(GetPlanet), new { id = planet.Id }, planetReadDTO);
+                return BadRequest();
             }
-                
 
-            return BadRequest();
+            return CreatedAtRoute(nameof(GetPlanet), new { id = planetReadDTO.Id }, planetReadDTO);
         }
 
         /// <summary>
@@ -90,12 +88,14 @@ namespace PlanetCargoTransport.Application.Controllers
                 return NotFound();
             }
 
-            if (await _planetService.UpdateAsync(_mapper.Map(planetDTO, planet)))
+            var isSuccessfull = await _planetService.UpdateAsync(planetDTO);
+
+            if (!isSuccessfull)
             {
-                return Ok();
+                return BadRequest();
             }
 
-            return BadRequest();
+            return Ok();
         }
 
         /// <summary>
@@ -114,12 +114,14 @@ namespace PlanetCargoTransport.Application.Controllers
                 return NotFound();
             }
 
-            if (await _planetService.DeleteAsync(id))
+            var isSuccessfull = await _planetService.DeleteAsync(id);
+
+            if (!isSuccessfull)
             {
-                return Ok();
+                return BadRequest();
             }
  
-            return BadRequest();
+            return Ok();
         }
     }
 }
