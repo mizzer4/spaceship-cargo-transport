@@ -1,42 +1,60 @@
 using AutoFixture;
+using AutoFixture.AutoMoq;
 using AutoFixture.Dsl;
+using AutoMapper;
 using FluentAssertions;
 using Moq;
+using SpaceshipCargoTransport.Application.DTOs.PlanetDTOs;
 using SpaceshipCargoTransport.Domain.Models;
 using SpaceshipCargoTransport.Domain.Repositories;
 using SpaceshipCargoTransport.Domain.Services;
+using System.Numerics;
 
 namespace SpaceshipCargoTransport.Domain.UnitTests.Services
 {
     public class PlanetServiceTests
     {
         private readonly Mock<IPlanetRepository> planetRepositoryMock;
+        private readonly Mock<IMapper> mapper;
         private readonly PlanetService sut;
+
         private readonly ICustomizationComposer<Planet> planetComposer;
+        private readonly ICustomizationComposer<PlanetCreateDTO> planetCreateDTOComposer;
+        private readonly ICustomizationComposer<PlanetUpdateDTO> planetUpdateDTOComposer;
+        private readonly ICustomizationComposer<PlanetReadDTO> planetReadDTOComposer;
 
         public PlanetServiceTests()
         {
-            planetRepositoryMock = new Mock<IPlanetRepository>();
-            sut = new PlanetService(planetRepositoryMock.Object);
-
             var fixture = new Fixture();
+            fixture.Customize(new AutoMoqCustomization());
+
+            planetRepositoryMock = fixture.Freeze<Mock<IPlanetRepository>>();
+            mapper = fixture.Freeze<Mock<IMapper>>();
             planetComposer = fixture.Build<Planet>();
+            planetCreateDTOComposer = fixture.Build<PlanetCreateDTO>();
+            planetUpdateDTOComposer = fixture.Build<PlanetUpdateDTO>();
+            planetReadDTOComposer = fixture.Build<PlanetReadDTO>();
+
+            sut = fixture.Build<PlanetService>().Create();         
         }
 
         [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public async Task CreateAsync_ShouldReturnCorrectValue_WhenCreationIsFinished(bool returnValue)
+        [ClassData(typeof(PlanetCreateTestData))]
+        public async Task CreateAsync_ShouldReturnCorrectValue_WhenCreationIsFinished(PlanetReadDTO? planetReadDTO, bool returnValue)
         {
             // given
             var planet = planetComposer.Create();
+            var planetCreateDTO = planetCreateDTOComposer.Create();
+
             planetRepositoryMock.Setup(repo => repo.CreateAsync(planet)).ReturnsAsync(returnValue);
+            mapper.Setup(map => map.Map<Planet>(planetCreateDTO)).Returns(planet);
+            mapper.Setup(map => map.Map<PlanetReadDTO>(planet)).Returns(planetReadDTO);
 
             // when
-            var result = await sut.CreateAsync(planet);
+            var result = await sut.CreateAsync(planetCreateDTO);
 
             // then
-            result.Should().Be(returnValue);
+            result.Should().Be(planetReadDTO);
         }
 
         [Theory]
@@ -63,10 +81,13 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
         {
             // given
             var planet = planetComposer.Create();
+            var planetUpdateDTO = planetUpdateDTOComposer.Create();
+
             planetRepositoryMock.Setup(repo => repo.UpdateAsync(planet)).ReturnsAsync(returnValue);
+            mapper.Setup(map => map.Map<Planet>(planetUpdateDTO)).Returns(planet);
 
             // when
-            var result = await sut.UpdateAsync(planet);
+            var result = await sut.UpdateAsync(planetUpdateDTO);
 
             // then
             result.Should().Be(returnValue);
@@ -74,29 +95,18 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
 
         [Theory]
         [ClassData(typeof(PlanetTestData))]
-        public async Task GetAsync_ShouldReturnPlanetOrNull_WhenGuidIsProvided(Planet? planet, Planet? expectedResult)
+        public async Task GetAsync_ShouldReturnPlanetOrNull_WhenGuidIsProvided(Planet? planet, PlanetReadDTO? planetDTO)
         {
             // given
             var guid = Guid.NewGuid();
             planetRepositoryMock.Setup(repo => repo.GetAsync(guid)).ReturnsAsync(planet);
+            mapper.Setup(map => map.Map<PlanetReadDTO>(planet)).Returns(planetDTO);
 
             // when
             var result = await sut.GetAsync(guid);
 
             // then
-            result.Should().Be(expectedResult);
-        }
-
-        public class PlanetTestData : TheoryData<Planet?, Planet?>
-        {
-            public PlanetTestData()
-            {
-                var fixture = new Fixture();
-                var planet = fixture.Build<Planet>().Create();                
-
-                Add(planet, planet);
-                Add(null, null);
-            }
+            result.Should().Be(planetDTO);
         }
 
         [Fact]
@@ -109,13 +119,45 @@ namespace SpaceshipCargoTransport.Domain.UnitTests.Services
                     planetComposer.Create()
             };
 
+            var planetDTOs = new List<PlanetReadDTO>
+            {
+                    planetReadDTOComposer.Create(),
+                    planetReadDTOComposer.Create()
+            };
+
             planetRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(planets);
+            mapper.Setup(map => map.Map<IEnumerable<PlanetReadDTO>>(planets)).Returns(planetDTOs);
 
             // when
             var result = await sut.GetAllAsync();
 
             // then
-            result.Should().BeEquivalentTo(planets);
+            result.Should().BeEquivalentTo(planetDTOs);
+        }
+
+        public class PlanetTestData : TheoryData<Planet?, PlanetReadDTO?>
+        {
+            public PlanetTestData()
+            {
+                var fixture = new Fixture();
+                var planet = fixture.Build<Planet>().Create();
+                var planetDTO = fixture.Build<PlanetReadDTO>().Create();
+
+                Add(planet, planetDTO);
+                Add(null, null);
+            }
+        }
+
+        public class PlanetCreateTestData : TheoryData<PlanetReadDTO?, bool>
+        {
+            public PlanetCreateTestData()
+            {
+                var fixture = new Fixture();
+                var planetReadDTO = fixture.Build<PlanetReadDTO>().Create();
+
+                Add(planetReadDTO, true);
+                Add(null, false);
+            }
         }
     }
 }

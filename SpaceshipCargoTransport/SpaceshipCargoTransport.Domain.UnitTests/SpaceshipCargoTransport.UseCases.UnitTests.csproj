@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SpaceshipCargoTransport.Domain\SpaceshipCargoTransport.Domain.csproj" />
+    <ProjectReference Include="..\SpaceshipCargoTransport.UseCases\SpaceshipCargoTransport.UseCases.csproj" />
   </ItemGroup>
 
 </Project>
